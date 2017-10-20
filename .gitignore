@@ -5,3 +5,4 @@ cmake-build-debug/
 *.cbp
 *.map
 *.jdebug*
+.idea/
