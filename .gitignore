@@ -1,8 +1,5 @@
 cmake-build-debug/
-*.elf
-*.bin
-*.hex
-*.cbp
-*.map
+build/
+*.swp
 *.jdebug*
 .idea/
