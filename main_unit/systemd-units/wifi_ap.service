@@ -1,0 +1,13 @@
+[Unit]
+Description=Wifi AP
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root
+ExecStart=/usr/bin/create_ap --config /etc/create_ap.conf
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
