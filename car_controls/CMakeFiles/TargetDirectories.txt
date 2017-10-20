@@ -1,0 +1,4 @@
+/home/alok/study/5semester/robo_race/autonomous-car/car_controls/CMakeFiles/rebuild_cache.dir
+/home/alok/study/5semester/robo_race/autonomous-car/car_controls/CMakeFiles/edit_cache.dir
+/home/alok/study/5semester/robo_race/autonomous-car/car_controls/CMakeFiles/CMSIS.dir
+/home/alok/study/5semester/robo_race/autonomous-car/car_controls/CMakeFiles/car_controls.elf.dir
