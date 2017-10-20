@@ -11,7 +11,6 @@
 ### CMake settings:
 * Configuration:	Debug
 * CMake options: 	-DCMAKE_TOOLCHAIN_FILE=STM32F303x8.cmake
-* Generation path: 	build
 ### Run/Debug Configurations:
 * Target: 		All targets
 * Configuration: 	Debug
@@ -26,6 +25,9 @@
  * Host Interface:	USB
  * Serial No:		-
  * Binary file:		{path_to_elf_file}.elf
+### Building Script
+ * call "./build.sh" for building the project
+ * call "./build.sh -c" to update library configuration and build the project
 
 ## converted st-link on-board into j-link debugger:
 * https://goo.gl/Q71J2X
