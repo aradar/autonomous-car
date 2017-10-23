@@ -3,3 +3,4 @@ build/
 *.swp
 *.jdebug*
 .idea/
+venv/
