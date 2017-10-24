@@ -1,9 +1,25 @@
 #!/usr/bin/env python3
 
-import serial
+# import serial
 import sys
 import struct
 from enum import Enum
+
+##############################################
+#
+# to create a new Packet do the following:
+#
+# 	packet = Packet()
+# 	packet.mode = <mode> 			# where <mode> is one of "Mode.DRIVE" or "Mode.STEER"
+# 	packet.direction = <direction> 		# where <direction> is one of "Direction.BACKWARD" or "Direction.FORWARD"
+# 	packet.debug_lvl = <debug_level> 	# where <debug_lvl> is an int with: 0 <= debug_lvl < 64
+# 	packet.value = <value> 			# where <value> should be better defined in the next version :P
+#
+# to send this packet do:
+#
+# 	serial.write(packet.getData())
+#
+##############################################
 
 NULL_MASK 	= 0b00000000
 MODE_MASK 	= 0b10000000
@@ -26,22 +42,14 @@ class Packet:
 
 	def fromData(data):
 		print("Packet::fromData(): TODO")
+	def getData(self):
+		return struct.pack(">Bf", self.getHeader(), self.getValue())
 	def getHeader(self):
-		data = 0
-		data |= MODE_MASK if self.mode == Mode.DRIVE else NULL_MASK
-		data |= DIRECTION_MASK if self.direction == Direction.BACKWARD else NULL_MASK
-		data |= OPTION_MASK & self.debug_lvl
-		print("data = ", data)
-		# data.append(bytes(struct.pack("f", float(self.value))))
-		return data
+		header = 0
+		header |= MODE_MASK if self.mode == Mode.DRIVE else NULL_MASK
+		header |= DIRECTION_MASK if self.direction == Direction.BACKWARD else NULL_MASK
+		header |= OPTION_MASK & self.debug_lvl
+		return header
 
 	def getValue(self):
-		return struct.pack("f", self.value)
-
-packet = Packet()
-packet.mode = Mode.STEER
-packet.direction = Direction.FORWARD
-packet.debug_lvl = 2
-packet.value = 33.4
-serial.write(packet.getHeader())
-serial.write(packet.getValue())
+		return float(self.value)
