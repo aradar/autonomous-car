@@ -15,6 +15,10 @@ from enum import Enum
 # 	packet.debug_lvl = <debug_level> 	# where <debug_lvl> is an int with: 0 <= debug_lvl < 64
 # 	packet.value = <value> 			# where <value> should be better defined in the next version :P
 #
+# or use:
+#	packet = Packet()
+#	packet.setData(<mode>, <direction>, <debug_lvl>, <value>)
+#
 # to send this packet do:
 #
 # 	serial.write(packet.getData())
@@ -40,6 +44,11 @@ class Packet:
 	debug_lvl = 0
 	value = 0.0
 
+	def setData(self, mode_, direction_, debug_lvl_, value_):
+		self.mode = mode_
+		self.direction = direction_
+		self.debug_lvl = debug_lvl_
+		self.value = value_
 	def fromData(data):
 		print("Packet::fromData(): TODO")
 	def getData(self):
