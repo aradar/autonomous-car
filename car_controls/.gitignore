@@ -1,0 +1,4 @@
+.mbed
+.temp/
+venv/
+mbed/
