@@ -13,7 +13,7 @@ for more --> https://virtualenv.pypa.io/en/stable/userguide/
 Make sure cc_venv is activated!
 ```sh
 (cc_venv)$ mbed deploy              			# adds mbed library to project + installs mbed 2.0 SDK tools (time for a coffee!)
-(cc_venv)$ mbed compile -m NUCLEO_F303K8 -t GCC_ARM 	# compiles sourcecode and generates elf & bin files
+(cc_venv)$ mbed compile 				# compiles sourcecode and generates elf & bin files
 # bin file can now be flashed to the nucleo
 ...
 (cc_venv)$ rm -r .temp/            			# otherwise the following line is NOT POSSIBLE
