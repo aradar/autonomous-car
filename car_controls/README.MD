@@ -10,6 +10,12 @@ $ source ../cc_venv/bin/activate    # activate virtual environment
 ```
 for more --> https://virtualenv.pypa.io/en/stable/userguide/
 ## mbed-cli
+### Requirements
+* arm-none-eabi-gcc
+* git
+* mercurial
+* arm-none-eabi-newlib (arch)
+
 Make sure cc_venv is activated!
 ```sh
 (cc_venv)$ mbed deploy              			# adds mbed library to project + installs mbed 2.0 SDK tools (time for a coffee!)
