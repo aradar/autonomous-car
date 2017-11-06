@@ -42,7 +42,7 @@ class Packet:
 	mode = Mode.STEER
 	direction = Direction.FORWARD
 	debug_lvl = 0
-	value = 0.0
+	value = 0
 
 	def setData(self, mode_, direction_, debug_lvl_, value_):
 		self.mode = mode_
@@ -52,7 +52,7 @@ class Packet:
 	def fromData(data):
 		print("Packet::fromData(): TODO")
 	def getData(self):
-		return struct.pack(">Bf", self.getHeader(), self.getValue())
+		return struct.pack("<Bi", self.getHeader(), self.getValue())
 	def getHeader(self):
 		header = 0
 		header |= MODE_MASK if self.mode == Mode.DRIVE else NULL_MASK
@@ -61,4 +61,4 @@ class Packet:
 		return header
 
 	def getValue(self):
-		return float(self.value)
+		return int(self.value)
