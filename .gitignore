@@ -1,2 +1,6 @@
-cmake-build-debug/
-build/
+.temp/
+cc_venv/
+mbed/
+BUILD/
+mbed_settings.py     
+mbed_settings.pyc      
