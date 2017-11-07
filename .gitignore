@@ -4,3 +4,10 @@ build/
 *.jdebug*
 .idea/
 mu_venv/
+.temp/
+cc_venv/
+mbed/
+servo/
+BUILD/
+mbed_settings.py     
+mbed_settings.pyc      
