@@ -14,7 +14,6 @@ $ source ../cc_venv/bin/activate    # activate virtual environment
 for more --> https://virtualenv.pypa.io/en/stable/userguide/
 ## mbed-cli
 ### Requirements
-* 
 * arm-none-eabi-gcc
 * git
 * mercurial
