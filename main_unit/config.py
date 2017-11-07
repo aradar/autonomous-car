@@ -10,13 +10,13 @@ def print_help():
     print("main_unit install")
 
 def setup_venv():
-    os.system("python -m venv venv")
+    os.system("python -m venv ../mu_venv")
 
 def remove_venv():
-    os.system("rm -rf venv")
+    os.system("rm -rf ../mu_venv")
 
 def install_reqs():
-    os.system("venv/bin/pip install -r requirements.txt")
+    os.system("../mu_venv/bin/pip install -r requirements.txt")
 
 if len(sys.argv) != 2:
     print_help()

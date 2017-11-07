@@ -3,4 +3,4 @@ build/
 *.swp
 *.jdebug*
 .idea/
-venv/
+mu_venv/
