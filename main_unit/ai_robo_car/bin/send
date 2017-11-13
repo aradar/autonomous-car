@@ -1,9 +1,17 @@
 #!/usr/bin/env python3
 
-import serial
+import os
 import sys
-from packet import *
-import struct
+
+import serial
+
+from src.packet import Packet, Mode, Direction
+
+print(os.environ["PYTHONPATH"])
+
+os.environ["PYTHONPATH"] = "../ai_robo_car/"
+
+print(os.environ["PYTHONPATH"])
 
 dev = '/dev/ttyS0'
 baud = 9600

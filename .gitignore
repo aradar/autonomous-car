@@ -1,14 +1,22 @@
+# dirs
 cmake-build-debug/
 build/
+mbed/
+BUILD/
+servo/
+__pycache__/
+*.egg-info
+
+# hidden dirs
+.idea/
+.temp/
+
+# files
+mbed_settings.py     
+.ycm_extra_conf.py
+.venv
+
+# file types
 *.swp
 *.jdebug*
-.idea/
-mu_venv/
-.temp/
-cc_venv/
-mbed/
-servo/
-BUILD/
-mbed_settings.py     
-mbed_settings.pyc
-.ycm_extra_conf.py
+*.pyc
