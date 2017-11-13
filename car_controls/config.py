@@ -10,16 +10,22 @@ def print_help():
     print("config.py install")
 
 def setup_venv():
-    if sys.platform == "darwin":
-        os.system("virtualenv ../cc_venv")
+    if sys.platform == "linux":
+        os.system("virtualenv2 cc_venv")
     else:
-        os.system("virtualenv2 ../cc_venv")	
+        os.system("virtualenv -p python2.exe ..\\cc_venv")
 
 def remove_venv():
-    os.system("rm -rf ../cc_venv")
-		
+    if  sys.platform != "win32":
+        os.system("rm -rf cc_venv")
+    else:
+        os.system("rmdir /Q /S ..\\cc_venv")
+
 def install_reqs():
-    os.system("../cc_venv/bin/pip install -r requirements.txt")
+    if  sys.platform != "win32":
+        os.system("cc_venv/bin/pip install -r requirements.txt")
+    else:
+        os.system("..\\cc_venv\\Scripts\\pip install -r requirements.txt")
 
 if len(sys.argv) != 2:
     print_help()
