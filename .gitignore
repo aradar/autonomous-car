@@ -10,4 +10,5 @@ mbed/
 servo/
 BUILD/
 mbed_settings.py     
-mbed_settings.pyc      
+mbed_settings.pyc
+.ycm_extra_conf.py
