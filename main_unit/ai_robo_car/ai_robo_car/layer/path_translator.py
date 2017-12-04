@@ -14,7 +14,12 @@ class PathTranslator(AbstractLayer[TargetPoint, EngineInstruction]):
         threshold_angle = 30
         if (x != 0) or (y != 0):
 
-            if x != 0:
+            if y == 0:
+                if x > 0:
+                    angle = threshold_angle
+                else:
+                    angle = -threshold_angle
+            elif x != 0:
                 angle = (math.atan(y / x) * 180) / math.pi
             else:
                 angle = 90
