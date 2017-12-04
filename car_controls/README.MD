@@ -18,6 +18,7 @@ for more --> https://virtualenv.pypa.io/en/stable/userguide/
 * git
 * mercurial
 * arm-none-eabi-newlib (arch)
+* stlink (usb library)
 
 Make sure cc_venv is activated!
 ```sh

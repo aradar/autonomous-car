@@ -1,0 +1,26 @@
+#!/usr/bin/env python3
+
+import os
+os.environ["PYTHONPATH"] = "../ai_robo_car/"
+
+from ai_robo_car.layer import ObjectRecognizer, RelativeTranslator, PathFinder, PathTranslator, EngineCommunicator
+
+layer1 = ObjectRecognizer(None, None)
+layer2 = RelativeTranslator(None, None)
+layer3 = PathFinder(None, None)
+layer4 = PathTranslator(None, None)
+layer5 = EngineCommunicator(None, None)
+
+layer1.lower = layer2
+layer2.lower = layer3
+layer3.lower = layer4
+layer4.lower = layer5
+layer2.upper = layer1
+layer3.upper = layer2
+layer4.upper = layer3
+layer5.upper = layer4
+
+layer1.call_from_upper("u")
+print()
+
+layer5.call_from_lower("l")
