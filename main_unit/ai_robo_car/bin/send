@@ -5,7 +5,7 @@ import sys
 
 import serial
 
-from src.packet import Packet, Mode, Direction
+from src.packet import Packetizer, Mode, Direction
 
 print(os.environ["PYTHONPATH"])
 
@@ -28,21 +28,13 @@ if len(sys.argv) is 4:
     debug_level = int(sys.argv[3])
     
     if control_type == '-d': # drive
-        packet = Packet()
-        packet.setData(Mode.DRIVE, Direction.BACKWARD, debug_level, control_value);
-        ser.write(packet.getData())
+        Packetizer.write_data(ser, Mode.DRIVE, Direction.BACKWARD, debug_level, control_value);
     elif control_type == '+d':
-        packet = Packet()
-        packet.setData(Mode.DRIVE, Direction.FORWARD, debug_level, control_value);
-        ser.write(packet.getData())
+        Packetizer.write_data(ser, Mode.DRIVE, Direction.FORWARD, debug_level, control_value);
     elif control_type == '+s': # steer
-        packet = Packet()
-        packet.setData(Mode.STEER, Direction.FORWARD, debug_level, control_value);
-        ser.write(packet.getData())
+        Packetizer.write_data(ser, Mode.STEER, Direction.FORWARD, debug_level, control_value);
     elif control_type == '-s': 
-        packet = Packet()
-        packet.setData(Mode.STEER, Direction.BACKWARD, debug_level, control_value);
-        ser.write(packet.getData())
+        Packetizer.write_data(ser, Mode.STEER, Direction.BACKWARD, debug_level, control_value);
 else:
     print('usage [+d/-d/+s/-s] <control_value> <debug_level>')
     
