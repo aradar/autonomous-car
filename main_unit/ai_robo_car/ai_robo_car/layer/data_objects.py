@@ -1,4 +1,6 @@
 from enum import Enum
+from typing import Tuple
+
 
 class ObjectType(Enum):
     UNDEFINED_OBJECT = 0
@@ -18,7 +20,18 @@ class BoundingBox:
 
 
 class DetectedObject:
-    def __init__(self, position, radius, object_type):
+    """
+    Represents the detected objects relative to the position of the camera. The origin of the coordinate system is
+    the position of the camera and the unit of measure is defined by the RelativeTranslator layer.
+    """
+
+    def __init__(self, position: Tuple[float, float], radius: float, object_type : ObjectType):
+        """
+        :param position: relative position of the center of the object
+        :param radius: radius of the object
+        :param object_type: type of the detected object
+        """
+
         self.position = position
         self.radius = radius
         self.object_type = object_type
