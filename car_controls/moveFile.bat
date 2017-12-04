@@ -1,0 +1,1 @@
+copy "BUILD\NUCLEO_F303K8\GCC_ARM\car_controls.bin" "D:\"
