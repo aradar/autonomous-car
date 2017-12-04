@@ -18,3 +18,9 @@ class AbstractLayer(Generic[U, L]):
 
     def call_from_upper(self, message: U) -> None:
         raise NotImplementedError
+
+    def call_lower(self, message: U) -> None:
+        self.lower.call_from_upper(message)
+
+    def call_upper(self, message: L) -> None:
+        self.upper.call_from_lower(message)

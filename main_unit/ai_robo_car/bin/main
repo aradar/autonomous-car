@@ -3,12 +3,12 @@
 import os
 os.environ["PYTHONPATH"] = "../ai_robo_car/"
 
-from ai_robo_car.layer import ObjectRecognizer, RelativeTranslator, PathFinder, MovementCalculator, EngineCommunicator
+from ai_robo_car.layer import ObjectRecognizer, RelativeTranslator, PathFinder, PathTranslator, EngineCommunicator
 
 layer1 = ObjectRecognizer(None, None)
 layer2 = RelativeTranslator(None, None)
 layer3 = PathFinder(None, None)
-layer4 = MovementCalculator(None, None)
+layer4 = PathTranslator(None, None)
 layer5 = EngineCommunicator(None, None)
 
 layer1.lower = layer2
