@@ -3,6 +3,7 @@ from ai_robo_car.layer.data_objects import EngineInstruction
 from ai_robo_car.packet import Packetizer, Side, Direction
 import serial
 import socket
+import math
 
 class EngineCommunicator(AbstractLayer[EngineInstruction, None]):
     def __init__(self, upper: AbstractLayer, lower: AbstractLayer, is_test_communication=False):
@@ -19,8 +20,10 @@ class EngineCommunicator(AbstractLayer[EngineInstruction, None]):
         if self.ser is not None:
             side = Side.LEFT if engine_instruction.steer < 0 else Side.RIGHT
             direction = Direction.BACKWARD if engine_instruction.speed < 0 else Direction.FORWARD
-             
-            data = Packetizer.create_data(side, direction, 0, engine_instruction.steer, engine_instruction.speed)
+            steer = math.fabs(engine_instruction.steer)
+            speed = math.fabs(engine_instruction.speed)
+
+            data = Packetizer.create_data(side, direction, 0, steer, speed)
             if self.is_test_communication:
                 self.ser.send(data)
                 self.ser.close()
