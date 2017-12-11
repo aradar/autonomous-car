@@ -26,7 +26,6 @@ class EngineCommunicator(AbstractLayer[EngineInstruction, None]):
             data = Packetizer.create_data(side, direction, 0, steer, speed)
             if self.is_test_communication:
                 self.ser.send(data)
-                self.ser.close()
             else:
                 self.ser.write(data)
 
@@ -35,4 +34,5 @@ class EngineCommunicator(AbstractLayer[EngineInstruction, None]):
         if self.upper is not None:
             self.upper.call_upper(message + str("!"))
 
-        
+    def close(self):
+        self.ser.close()

@@ -42,7 +42,7 @@ class Packetizer:
     def create_header(side: Side, direction: Direction, debug_lvl: int):
         header = 0
         header |= SIDE_MASK if side == Side.RIGHT else NULL_MASK
-        header |= DIRECTION_MASK if direction == Direction.BACKWARD else NULL_MASK
+        header |= DIRECTION_MASK if direction == Direction.FORWARD else NULL_MASK
         header |= OPTION_MASK & debug_lvl
         return header
 
