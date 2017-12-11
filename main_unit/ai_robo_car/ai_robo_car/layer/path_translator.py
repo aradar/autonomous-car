@@ -6,7 +6,6 @@ import math
 class PathTranslator(AbstractLayer[TargetPoint, EngineInstruction]):
     def call_from_upper(self, message: TargetPoint) -> None:
         (x, y) = message.position
-        print("PathTranslator: call_from_upper ->", x, y)
 
         steer = 0
         speed = 0
@@ -45,7 +44,6 @@ class PathTranslator(AbstractLayer[TargetPoint, EngineInstruction]):
             speed = 0.5 + 0.5 * speed
 
         if self.lower is not None:
-            print("PathTranslator: call_lower -> speed: %d, steer: %d" % (speed, steer))
             self.call_lower(EngineInstruction(speed, steer))
 
     def call_from_lower(self, message: EngineInstruction) -> None:
