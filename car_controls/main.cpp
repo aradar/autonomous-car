@@ -1,9 +1,10 @@
 #include "mbed.h"
 #include "Servo.h"
+#include <string>
 
 uint8_t const SIDE_MASK = 0x80;
 uint8_t const DIRECTION_MASK = 0x40;
-uint8_t const DEBUG_MASK = ~ (SIDE_MASK | DIRECTION_MASK);
+uint8_t const DEBUG_MASK = ~(SIDE_MASK | DIRECTION_MASK);
 
 bool received_something = false;
 int wait_millis = 0;
@@ -11,6 +12,9 @@ int wait_millis = 0;
 //Serial pc(USBTX, USBRX); // tx, rx
 Serial pi(PB_6, PB_7, 9600); //UART1_TX / D4, UART1_RX / D5
 DigitalOut statusLed(LED1);
+
+float calculateSpeed(float valueSpeed, string direction);
+float calculateSteer(float valueSteer, string side);
 
 struct SerialInputProtocol {
     enum {LEFT, RIGHT} side;
@@ -27,9 +31,6 @@ struct SerialInputProtocol {
         result.side = (options & SIDE_MASK) == SIDE_MASK ? RIGHT : LEFT;
         result.direction = (options & DIRECTION_MASK) == DIRECTION_MASK ? FORWARD : BACKWARD ;
         result.debugLevel = DEBUG_MASK & options;
-        
-        //unsigned int valueSteer_as_int = valueSteer1_as_byte*16777216 + valueSteer2_as_byte*65536 + valueSteer3_as_byte*256 + valueSteer4_as_byte;
-        //int valueSteer_as_int = (*((int*) (buffer + 1)));
         result.valueSteer = (*((int*) (++buffer)));
         result.valueSpeed = (*((int*) (++buffer)));
              
@@ -38,24 +39,21 @@ struct SerialInputProtocol {
 };
 
 struct CarState {
-    Servo RIGHT;
-    Servo LEFT;
-    Servo MOVEMENT;
+    Servo steer;
+    Servo drive;
 
-    float RIGHT_update;
-    float LEFT_update;
-    float MOVEMENT_update;
+    float steer_update;
+    float drive_update;
     
-    bool MOVEMENT_changed;
-    bool RIGHT_changed;
-    bool LEFT_changed;
+    bool drive_changed;
+    bool steer_changed;
     
-    CarState(PinName RIGHT_pin, PinName LEFT_pin, PinName MOVEMENT_pin)
-        : RIGHT(RIGHT_pin), LEFT(LEFT_pin), MOVEMENT(MOVEMENT_pin){
+    CarState(PinName DRIVE_pin, PinName STEER_pin)
+        : drive(DRIVE_pin), steer(STEER_pin){
     }
 };
 
-CarState state(PA_12, PB_0, PF_0);		// TODO WHICH PIN?
+CarState state(PA_12, PB_0);
 
 int const BUFFER_SIZE = 5;
 uint8_t rx_buffer[BUFFER_SIZE];
@@ -65,23 +63,23 @@ void serialReadCallback() {
     
     if (input.side == SerialInputProtocol::LEFT) {
         if (input.direction == SerialInputProtocol::FORWARD) {		// Forward Left
-            state.MOVEMENT_update = calculateSpeed(input.valueSpeed, "FORWARD");
-            state.LEFT_update = calculateSteer(input.valueSteer, "LEFT");
+            state.drive_update = calculateSpeed(input.valueSpeed, "FORWARD");
+            state.steer_update = calculateSteer(input.valueSteer, "LEFT");
         } else {													// Backwards Left
-        	state.MOVEMENT_update = calculateSpeed(input.valueSpeed, "BACKWARDS");				
-            state.LEFT_update = calculateSteer(input.valueSteer, "LEFT");				
+        	state.drive_update = calculateSpeed(input.valueSpeed, "BACKWARDS");				
+            state.steer_update = calculateSteer(input.valueSteer, "LEFT");				
         }
     } else if (input.side == SerialInputProtocol::RIGHT) {
         if (input.direction == SerialInputProtocol::FORWARD) {		// Forward Right
-            state.MOVEMENT_update = calculateSpeed(input.valueSpeed, "FORWARD");
-            state.RIGHT_update = calculateSteer(input.valueSteer, "RIGHT");
+            state.drive_update = calculateSpeed(input.valueSpeed, "FORWARD");
+            state.steer_update = calculateSteer(input.valueSteer, "RIGHT");
         } else {													// Backwards Right
-            state.MOVEMENT_update = calculateSpeed(input.valueSpeed, "BACKWARDS");
-            state.RIGHT_update = calculateSteer(input.valueSteer, "RIGHT");	
+            state.drive_update = calculateSpeed(input.valueSpeed, "BACKWARDS");
+            state.steer_update = calculateSteer(input.valueSteer, "RIGHT");	
         }
     }
-    MOVEMENT_changed = true;
-    state.RIGHT_changed = true;
+    state.drive_changed = true;
+    state.steer_changed = true;
 }
 
 int rx_buffer_size = 0;
@@ -103,9 +101,9 @@ void rx_interrupt() {
     }
 }
 
-void calculateSteer(float valueSteer, string side){
+float calculateSteer(float valueSteer, string side){
 	if (valueSteer > 0.4){
-		valueSpeed=0.4;
+		valueSteer=0.4;
 	}
 	if (side=="LEFT"){
 		return 0.4 - (valueSteer/10);
@@ -114,7 +112,7 @@ void calculateSteer(float valueSteer, string side){
 	}
 }
 
-void calculateSpeed(float valueSpeed, string direction){
+float calculateSpeed(float valueSpeed, string direction){
 	if (valueSpeed == 0.0){
 			return 0;
 	}
@@ -137,24 +135,14 @@ int main() {
     wait(1);
     
     while(1) {
-        //__disable_irq();
-
-        if (state.RIGHT_changed) {
-            state.RIGHT = state.RIGHT_update;
-            state.RIGHT_changed = false;
+        if (state.steer_changed) {
+            state.steer = state.steer_update;
+            state.steer_changed = false;
         }
-        if (state.LEFT_changed) {
-            state.LEFT = state.LEFT_update;
-            state.LEFT_changed = false;
-        }
-        if (state.MOVEMENT_changed) {
-        	state.MOVEMENT = state.MOVEMENT_update;
-        	state.MOVEMENT_changed = false;
-        }
-
-
-        //__enable_irq();
-        
+        if (state.drive_changed) {
+            state.drive = state.drive_update;
+            state.drive_changed = false;
+        }        
 
         wait_ms(wait_millis);
         
