@@ -31,7 +31,6 @@ class DetectedObject:
         :param radius: radius of the object
         :param object_type: type of the detected object
         """
-
         self.position = position
         self.radius = radius
         self.object_type = object_type
