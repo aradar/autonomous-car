@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 
-import os
-os.environ["PYTHONPATH"] = "../ai_robo_car/"
-
 from ai_robo_car.layer import ObjectRecognizer, RelativeTranslator, PathFinder, PathTranslator, EngineCommunicator
 
 layer1 = ObjectRecognizer(None, None)
