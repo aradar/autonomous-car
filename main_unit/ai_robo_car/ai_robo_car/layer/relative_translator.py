@@ -50,8 +50,10 @@ class RelativeTranslator(AbstractLayer[List[BoundingBox], List[DetectedObject]])
                 x = self.calc_x(bounding_box.left, radius, y)
                 detected_objects.append(DetectedObject((x, y), radius, bounding_box.object_type))
 
-        if len(detected_objects) != 0:
-            self.call_lower(detected_objects)
+        if len(detected_objects) == 0:
+            detected_objects = None
+
+        self.call_lower(detected_objects)
 
     def call_from_lower(self, message: str) -> None:
         raise NotImplementedError
