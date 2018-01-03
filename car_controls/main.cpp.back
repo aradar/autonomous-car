@@ -1,10 +1,6 @@
 #include "mbed.h"
 #include "Servo.h"
 
-uint8_t const MODE_MASK = 0x80;
-uint8_t const DIRECTION_MASK = 0x40;
-uint8_t const DEBUG_MASK = ~ (MODE_MASK | DIRECTION_MASK);
-
 bool received_something = false;
 int wait_millis = 0;
 
@@ -96,6 +92,7 @@ void rx_interrupt() {
     }
 }
 
+/*
 int main() {
     //pi.attach(rx_interrupt, Serial::RxIrq);
     pi.attach(&rx_interrupt);
@@ -125,3 +122,4 @@ int main() {
         statusLed = 0;
     }
 }
+*/
