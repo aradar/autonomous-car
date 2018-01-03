@@ -21,10 +21,13 @@
 - add `alarm ALL=(ALL) ALL`
 
 ## Serial Port Setup
+- open `/boot/confix.txt`
 - add `enable_uart=1`
+- open `/boot/cmdline.txt`
+- remove `console=ttyAMA0,115200 kgdboc=ttyAMA0,115200`
 - `/boot/cmdline.txt #remove console=ttyAMA0,115200 kgdboc=ttyAMA0,115200`
-- stop service serial-getty@ttyS0.service
-- disable service serial-getty@ttyS0.service
+- disable getty service on ttyS0 `systemctl disable serial-getty@ttyS0.service`
+- stop getty service on ttyS0 `systemctl stop serial-getty@ttyS0.service`
 
 ## Activating hotspot
 - clone the repo
