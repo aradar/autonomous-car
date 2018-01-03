@@ -5,6 +5,8 @@
 - vim
 - git
 - python3 (3.6.2)
+- cmake, make, gcc, boost (,libusb.dev)
+- pixy library
 
 # Serial Port Setup
 - add `enable_uart=1`
