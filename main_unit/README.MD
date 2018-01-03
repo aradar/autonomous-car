@@ -24,8 +24,8 @@
 - open `/boot/confix.txt`
 - add `enable_uart=1`
 - open `/boot/cmdline.txt`
-- remove `console=ttyAMA0,115200 kgdboc=ttyAMA0,115200`
-- `/boot/cmdline.txt #remove console=ttyAMA0,115200 kgdboc=ttyAMA0,115200`
+- remove `console=ttyAMA0,115200`
+- remove `kgdboc=ttyAMA0,115200`
 - disable getty service on ttyS0 `systemctl disable serial-getty@ttyS0.service`
 - stop getty service on ttyS0 `systemctl stop serial-getty@ttyS0.service`
 
