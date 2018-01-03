@@ -1,17 +1,16 @@
-# Car Controls
+#Car Controls
 ## Virtual Environment
 ### Requirements
-* virtualenv2
+* python2-virtualenv
+* python-virtualenvwrapper
 
 ```sh
-$ cd car_controls
-$ ./config.py setup                 # setup virtual environment
-$ ./config.py install               # installing all requirements in requirements.txt
-$ source ../cc_venv/bin/activate    # activate virtual environment
-...
-(cc_venv)$ deactivate               # for deactivating virtual environment
+mkvirtualenv --python=/usr/bin/python2.x cc_venv
+workon cc_venv
+pip install -r requirements.txt
 ```
-for more --> https://virtualenv.pypa.io/en/stable/userguide/
+for more information [read the docs](https://virtualenvwrapper.readthedocs.io/en/latest/)
+
 ## mbed-cli
 ### Requirements
 * arm-none-eabi-gcc
