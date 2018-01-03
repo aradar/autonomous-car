@@ -12,10 +12,10 @@ Main::Main()
 
 void Main::run()
 {
-    wait(1);
+	wait(1);
 	int wait_time = wait_long;
 
-    while(1) {
+	while(1) {
 		if (nm::has_update())
 		{
 			wait_time = wait_short;
@@ -23,11 +23,11 @@ void Main::run()
 		}
 
 		// blinking
-        wait_ms(wait_time);
+		wait_ms(wait_time);
 		statusLed = 1;
-        wait_ms(wait_time);
-        statusLed = 0;
-    }
+		wait_ms(wait_time);
+		statusLed = 0;
+	}
 }
 
 
