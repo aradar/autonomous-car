@@ -5,13 +5,13 @@ import sys
 
 import serial
 
-from src.packet import Packetizer, Mode, Direction
+from ai_robo_car.packet import Packetizer, Side, Direction
 
-print(os.environ["PYTHONPATH"])
+#print(os.environ["PYTHONPATH"])
 
-os.environ["PYTHONPATH"] = "../ai_robo_car/"
+#os.environ["PYTHONPATH"] = "../ai_robo_car/"
 
-print(os.environ["PYTHONPATH"])
+#print(os.environ["PYTHONPATH"])
 
 dev = '/dev/ttyS0'
 baud = 9600
@@ -23,19 +23,20 @@ ser.baudrate = baud
 print('configure baudrate to: ' + str(baud))
 
 if len(sys.argv) is 4:
-    control_type = str(sys.argv[1])
-    control_value = float(sys.argv[2]) 
-    debug_level = int(sys.argv[3])
+    steer_value = float(sys.argv[1]) 
+    speed_value = float(sys.argv[2])
+    debug_level = 0 #int(sys.argv[3])
     
-    if control_type == '-d': # drive
-        Packetizer.write_data(ser, Mode.DRIVE, Direction.BACKWARD, debug_level, control_value);
-    elif control_type == '+d':
-        Packetizer.write_data(ser, Mode.DRIVE, Direction.FORWARD, debug_level, control_value);
-    elif control_type == '+s': # steer
-        Packetizer.write_data(ser, Mode.STEER, Direction.FORWARD, debug_level, control_value);
-    elif control_type == '-s': 
-        Packetizer.write_data(ser, Mode.STEER, Direction.BACKWARD, debug_level, control_value);
+    if steer_value < 0: # side
+        side = Side.LEFT
+    else:
+        side = Side.RIGHT
+    if drive_value < 0:
+        direction = Direction.BACKWARD
+    else:
+        direction = Direction.FORWARD
+    Packetizer.write_data(ser, side, direction, debug_level, steer_value, drive_value);
 else:
-    print('usage [+d/-d/+s/-s] <control_value> <debug_level>')
+    print('usage <steer_value> <speed_value> <debug_level>')
     
 ser.close()
