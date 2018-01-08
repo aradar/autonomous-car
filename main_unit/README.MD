@@ -80,7 +80,8 @@
 ### Setup PixyMon
  - to set a signature by not using the teach mode of the Pixy Cam you have to set up PixyMon
  - make sure you have installed at least `qt4` in addition to the other dependencies above
- -  change to pixy's home `build/pixymon/bin/`
+ - change to pixy's home `scripts/` and run `./build_pixymon_src.sh`
+ - change to `../build/pixymon/bin/`
  - and run `./PixyMon`
 
 ### Known Issues (Pixy Cam)
