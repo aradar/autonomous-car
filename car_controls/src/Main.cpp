@@ -5,6 +5,7 @@
 #include "NetworkManager.hpp"
 //#include "SerialInputProtocol.hpp"
 //#include "CarState.hpp"
+#include "RevCounter.hpp"
 
 Main::Main()
 	: statusLed(LED1), wait_long(1000), wait_short(100)
