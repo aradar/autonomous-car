@@ -66,7 +66,15 @@ flags = [
     '-I', '/usr/include/c++/7.2.1',
     '-I', '/usr/include',
     '-I', 'mbed/fb8e0ae1cceb',
+    '-I', 'servo',
     '-I', '.',
+
+    #config
+    '-DMBED_CONF_PLATFORM_STDIO_BAUD_RATE=9600',
+    '-DCLOCK_SOURCE=USE_PLL_HSI',
+    '-DMBED_CONF_PLATFORM_DEFAULT_SERIAL_BAUD_RATE=9600',
+    '-DMBED_CONF_PLATFORM_STDIO_FLUSH_AT_EXIT=1',
+    '-DMBED_CONF_PLATFORM_STDIO_CONVERT_NEWLINES=0',
 
     #mbed C flags
     '-std=gnu99',
@@ -193,7 +201,6 @@ flags = [
     '-I', 'mbed/fb8e0ae1cceb/drivers',
     '-I', 'mbed/fb8e0ae1cceb/hal',
     '-I', 'mbed/fb8e0ae1cceb/platform',
-    '-D', 'XXXXX',
 ]
 
 # Clang automatically sets the '-std=' flag to 'c++14' for MSVC 2015 or later,
