@@ -16,6 +16,13 @@
 - python-virtualenvwrapper
 - fakeroot
 
+## Install custom dependencies
+- go to the `main_unit/dependencies` dir and install all dependencies which are located there
+- example installation of the libpixyusb library
+  - go into the `libpixyusb` dir 
+  - call `makepkg -sic`
+  - confirm the installation
+
 ## Add user to sudoers file
 - `sudoedit /etc/sudoers`
 - add `alarm ALL=(ALL) ALL`
@@ -28,6 +35,7 @@
 - remove `kgdboc=ttyAMA0,115200`
 - disable getty service on ttyS0 `systemctl disable serial-getty@ttyS0.service`
 - stop getty service on ttyS0 `systemctl stop serial-getty@ttyS0.service`
+- add user to the `uucp` group with `usermod -G uucp alarm` to prevent the requirement of su rights to use the serial port
 
 ## Activating hotspot
 - clone the repo
