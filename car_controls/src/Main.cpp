@@ -37,5 +37,5 @@ void Main::run()
 		// blinking
         wait_ms(wait_time);
 		statusLed = !statusLed;
-    }
+	}
 }
