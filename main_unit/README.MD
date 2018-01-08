@@ -67,3 +67,19 @@
 - install the ai_robo_car python library in dev mode
   - go into the folder with the `setup.py` file and call `pip install -e .`
 
+## Setup Pixy Cam
+ - clone git repository of pixycam: https://github.com/charmedlabs/pixy.git
+ - install custom dependencies (TODO for ubuntu)
+ - execute bash script `build_libpixyusb_swig.sh` in pixy's home `scripts/`
+ - go to `../src/host/linux/` and export pixy rules as following: `sudo cp pixy.rules /etc/udev/rules.d/` to use Pixy Cam as non-root user
+ - change in pixy's home to `build/libpixyusb_swig` and try to execute `python2 get_blocks.py`
+ - if the script is throwing an exception try to format `get_blocks.py` to python3 syntax by changing the `print'...'` lines to `print(...)`and try again for python3
+ - now you should see an output or at least no more exceptions
+### Known Issues (Pixy Cam)
+ - `scripts/build_libpixyusb_swig.sh` is throwing several exceptions
+	 - try to update your `gcc`
+	 - script successfully built by using `gcc 7.2.1` 
+ - Using **Anaconda** as virtual environment:
+	 - `gcc` in anaconda is very... very outdated at the moment
+	 - if you still want to use Anaconda try a conda-forge: `conda create -n your_enironment_name python=3.6 numpy cython pystan -c conda-forge`
+	 - perhaps you have to reboot
