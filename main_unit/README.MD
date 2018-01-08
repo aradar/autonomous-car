@@ -67,14 +67,22 @@
 - install the ai_robo_car python library in dev mode
   - go into the folder with the `setup.py` file and call `pip install -e .`
 
-## Setup Pixy Cam
+## Setup Pixy Cam (Arch Way)
+
+ - NOTE: if you are using an ubuntu-based distribution, please try to follow the guideline on the official developer [wiki](http://cmucam.org/projects/cmucam5/wiki)
  - clone git repository of pixycam: https://github.com/charmedlabs/pixy.git
- - install custom dependencies (TODO for ubuntu)
+ - [install custom dependencies](##Installcustomdependencies)
  - execute bash script `build_libpixyusb_swig.sh` in pixy's home `scripts/`
  - go to `../src/host/linux/` and export pixy rules as following: `sudo cp pixy.rules /etc/udev/rules.d/` to use Pixy Cam as non-root user
  - change in pixy's home to `build/libpixyusb_swig` and try to execute `python2 get_blocks.py`
  - if the script is throwing an exception try to format `get_blocks.py` to python3 syntax by changing the `print'...'` lines to `print(...)`and try again for python3
  - now you should see an output or at least no more exceptions
+### Setup PixyMon
+ - to set a signature by not using the teach mode of the Pixy Cam you have to set up PixyMon
+ - make sure you have installed at least `qt4` in addition to the other dependencies above
+ -  change to pixy's home `build/pixymon/bin/`
+ - and run `./PixyMon`
+
 ### Known Issues (Pixy Cam)
  - `scripts/build_libpixyusb_swig.sh` is throwing several exceptions
 	 - try to update your `gcc`
@@ -83,3 +91,6 @@
 	 - `gcc` in anaconda is very... very outdated at the moment
 	 - if you still want to use Anaconda try a conda-forge: `conda create -n your_enironment_name python=3.6 numpy cython pystan -c conda-forge`
 	 - perhaps you have to reboot
+ - `get_blocks.py` cannot import the pixy module
+	 - try to run `pip install -e .` in the same directory as `get_blocks.py`
+	 - make sure to activate your virtual environment by doing the step named above
