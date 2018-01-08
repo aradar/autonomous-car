@@ -71,7 +71,7 @@
 
  - NOTE: if you are using an ubuntu-based distribution, please try to follow the guideline on the official developer [wiki](http://cmucam.org/projects/cmucam5/wiki)
  - clone git repository of pixycam: https://github.com/charmedlabs/pixy.git
- - [install custom dependencies](##Installcustomdependencies)
+ - [install custom dependencies](#install-custom-dependencies)
  - execute bash script `build_libpixyusb_swig.sh` in pixy's home `scripts/`
  - go to `../src/host/linux/` and export pixy rules as following: `sudo cp pixy.rules /etc/udev/rules.d/` to use Pixy Cam as non-root user
  - change in pixy's home to `build/libpixyusb_swig` and try to execute `python2 get_blocks.py`
