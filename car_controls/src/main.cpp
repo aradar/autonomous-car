@@ -2,6 +2,8 @@
 #include "Servo.h"
 #include <string>
 
+#include "RevCounter.hpp"
+
 uint8_t const SIDE_MASK = 0x80;
 uint8_t const DIRECTION_MASK = 0x40;
 uint8_t const DEBUG_MASK = ~(SIDE_MASK | DIRECTION_MASK);
@@ -16,7 +18,7 @@ enum Side { LEFT, RIGHT };
 enum Direction { BACKWARD, FORWARD };
 enum Movement { STANDING, MOVING_BACKWARD, MOVING_FORWARD };
 
-float calculateDrive(float value_actual_speed, Movement actual_movement, float value_target_speed, Movement target_movement);
+float calculateDrive(float value_current_speed, Movement current_movement, float value_target_speed, Movement target_movement);
 float calculateSteer(float valueSteer, Side side);
 
 void blink(float f);
@@ -48,18 +50,18 @@ struct CarState {
 	float steer;
 
 	float target_speed;
-	float actual_speed;
+	float current_speed;
 
 	Side side;
 
 	Movement target_movement;
-	Movement actual_movement;
+	Movement current_movement;
 
 	bool speed_changed;
 	bool steer_changed;
 
 	CarState()
-		: target_movement(STANDING), actual_movement(STANDING)
+		: target_movement(STANDING), current_movement(STANDING)
 	{}
 };
 
@@ -113,7 +115,7 @@ float calculateSteer(float value_steer, Side side){
 }
 
 // wrong
-float calculateDrive(float value_actual_speed, Movement actual_movement, float value_target_speed, Movement target_movement)
+float calculateDrive(float value_current_speed, Movement current_movement, float value_target_speed, Movement target_movement)
 {
 	// TODO
 	return 0.f;
@@ -140,6 +142,7 @@ void calibrate(Servo& drive, Servo& steer, DigitalOut& statusLed) {
 
 void test_servos(Servo& drive, Servo& steer, DigitalOut& statusLed)
 {
+	// start
 	for (float f = 0.35f; f < 0.65f; f += 0.005f)
 	{
 		steer = f;
@@ -149,11 +152,22 @@ void test_servos(Servo& drive, Servo& steer, DigitalOut& statusLed)
 
 	// vorwaerts 
 	drive = 0.65f;
-	blink(0.5f);
+	blink(0.3f);
+
+	drive = 0.58f;
+	//wait(10);
+	RevCounter revCounter;
+	for (int i = 0; i < 100; i++)
+	{
+		blink(0.05f);
+		wait(0.05f);
+		revCounter.update();
+	}
 
 	drive = 0.5f;
 	wait(2);
 
+	// end
 	for (int i = 0; i < 3; i++)
 	{
 		blink(0.2f);
@@ -180,14 +194,19 @@ int main() {
 
 	test_servos(drive, steer, statusLed);
 
-	/*
-    while(1) {
+	RevCounter revCounter;
+
+	int blink_counter = 0;
+
+    while (1) {
+		revCounter.update();
+		state.current_speed = revCounter.meters_per_second();
         if (state.steer_changed) {
             steer = calculateSteer(state.steer, state.side);
             state.steer_changed = false;
         }
         if (state.speed_changed) {
-            drive = calculateDrive(state.actual_speed, state.actual_movement, state.target_speed, state.target_movement);
+            drive = calculateDrive(state.current_speed, state.current_movement, state.target_speed, state.target_movement);
             state.speed_changed = false;
         }        
 
@@ -198,5 +217,4 @@ int main() {
 			statusLed = !statusLed;
 		}
     }
-	*/
 }
