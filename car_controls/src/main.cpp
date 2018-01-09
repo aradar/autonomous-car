@@ -1,6 +1,7 @@
 #include "mbed.h"
 #include "Servo.h"
 #include <string>
+#include "RevCounter.hpp"
 
 uint8_t const SIDE_MASK = 0x80;
 uint8_t const DIRECTION_MASK = 0x40;
@@ -16,7 +17,7 @@ enum Side { LEFT, RIGHT };
 enum Direction { BACKWARD, FORWARD };
 enum Movement { STANDING, MOVING_BACKWARD, MOVING_FORWARD };
 
-float calculateDrive(float value_actual_speed, Movement actual_movement, float value_target_speed, Movement target_movement);
+float calculateDrive(float value_actual_speed, float value_target_speed);
 float calculateSteer(float valueSteer, Side side);
 
 void blink(float f);
@@ -52,15 +53,10 @@ struct CarState {
 
 	Side side;
 
-	Movement target_movement;
-	Movement actual_movement;
-
-	bool speed_changed;
 	bool steer_changed;
+	bool speed_changed;
 
-	CarState()
-		: target_movement(STANDING), actual_movement(STANDING)
-	{}
+	CarState(){}
 };
 
 int const BUFFER_SIZE = 9;
@@ -73,7 +69,7 @@ void serialReadCallback() {
 
 	state.target_speed = input.value_speed;
 	state.steer = input.value_steer;
-
+	
 	state.speed_changed = true;
 	state.steer_changed = true;
 }
@@ -88,13 +84,13 @@ void rx_interrupt() {
 	rx_buffer_size++;
     rx_buffer_size = rx_buffer_size % BUFFER_SIZE;
     if (rx_buffer_size == 0) {
-		/*
+		
 		// echo
         for (int i = 0; i < BUFFER_SIZE; ++i) {
             pi.putc(rx_buffer[i]);
         }
         pi.putc('\n');
-		*/
+		
         
         serialReadCallback();
         received_something = true;
@@ -112,11 +108,11 @@ float calculateSteer(float value_steer, Side side){
 	}
 }
 
-// wrong
-float calculateDrive(float value_actual_speed, Movement actual_movement, float value_target_speed, Movement target_movement)
+float calculateDrive(float value_actual_speed, float value_target_speed)
 {
-	// TODO
-	return 0.f;
+    float b = 1;
+    float a = 0.04;
+    return b / (value_actual_speed * value_actual_speed + 1) * ((value_target_speed - value_actual_speed) * a) + 0.5;
 }
 
 const int CALIBRATION_TIME = 2;
@@ -175,28 +171,32 @@ int main() {
 
 	Servo drive(PA_12);
 	Servo steer(PB_0);
-
 	calibrate(drive, steer, statusLed);
 
-	test_servos(drive, steer, statusLed);
-
-	/*
+	// test_servos(drive, steer, statusLed);
+	state.actual_speed = 0;
+	state.target_speed = 0;
+	RevCounter rev;
+	
     while(1) {
         if (state.steer_changed) {
             steer = calculateSteer(state.steer, state.side);
             state.steer_changed = false;
         }
-        if (state.speed_changed) {
-            drive = calculateDrive(state.actual_speed, state.actual_movement, state.target_speed, state.target_movement);
-            state.speed_changed = false;
-        }        
+     	
+     	if (state.target_speed != state.actual_speed || state.speed_changed){
+        	drive = calculateDrive(state.actual_speed, state.target_speed);        
+        	state.actual_speed = rev.meters_per_second();
+        	state.speed_changed = false;
+		}
+		
+		rev.update();	
 
 		// blink
-		blink_counter++;
+		/*blink_counter++;
 		blink_counter = blink_counter % 2000;
 		if (blink_counter == 0) {
 			statusLed = !statusLed;
-		}
+		}*/
     }
-	*/
 }

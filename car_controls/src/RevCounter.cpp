@@ -17,8 +17,8 @@ void RevCounter::receive_tick(int time)
 void RevCounter::update()
 {
 	static bool active = false;
-	bool pin = std::rand() % 2;
-	//DigitalIn pin(PA_11);
+	//bool pin = std::rand() % 2;
+	DigitalIn pin(PA_11);
 
 	if (!active && pin) {
 		active = true;
@@ -43,5 +43,5 @@ float RevCounter::meters_per_second()
 	if (timer_.read_ms() < cur_tick_ + deltaTime)
 		deltaTime = timer_.read_ms() - cur_tick_;
 
-	return METERS_PER_REV / (deltaTime / 1000.f);
+	return METERS_PER_TICK / (deltaTime / 1000.f);
 }
