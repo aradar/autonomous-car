@@ -3,7 +3,7 @@
 
 #include <mbed.h>
 
-void receive_tick();
+static int countInterrupts = 0;
 
 class RevCounter {
 public:
@@ -12,6 +12,7 @@ public:
 	static void receive_tick();
 	void start();
 	float meters_per_second();
+	int elasped_time();
 
 private:
 	static int cur_tick_;

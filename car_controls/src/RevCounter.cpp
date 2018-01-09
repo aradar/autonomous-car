@@ -9,10 +9,13 @@ int RevCounter::prev_tick_;
 Timer RevCounter::timer_;
 
 RevCounter::RevCounter()
-{}
+{
+	start();
+}
 
 void RevCounter::receive_tick()
 {
+	countInterrupts++;
 	int time = timer_.read_ms();
 	prev_tick_ = cur_tick_;
 	cur_tick_ = time;
@@ -42,5 +45,10 @@ float RevCounter::meters_per_second()
 	if (timer_.read_ms() < cur_tick_ + deltaTime)
 		deltaTime = timer_.read_ms() - cur_tick_;
 
-	return METERS_PER_REV / (deltaTime / 1000.f);
+	return METERS_PER_TICK / (deltaTime / 1000.f);
+}
+
+int RevCounter::elasped_time()
+{
+	return timer_.read_ms();
 }
