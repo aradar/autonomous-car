@@ -5,6 +5,7 @@
 long long RevCounter::cur_tick_;
 long long RevCounter::prev_tick_;
 Timer RevCounter::timer_;
+bool RevCounter::overflowed_;
 int RevCounter::count_interrupts_;
 
 RevCounter::RevCounter()
@@ -20,6 +21,9 @@ void RevCounter::receive_tick()
 	int time = timer_.read_us();
 	prev_tick_ = cur_tick_;
 	cur_tick_ = time;
+
+	if (prev_tick_ > cur_tick_)
+		overflowed_ = true;
 }
 
 void RevCounter::start()
@@ -27,6 +31,7 @@ void RevCounter::start()
 	cur_tick_ = 0;
 	prev_tick_ = 0;
 	count_interrupts_ = 0;
+	overflowed_ = false;
 	timer_.reset();
 	timer_.start();
 	pin_.rise(&RevCounter::receive_tick);
@@ -58,4 +63,9 @@ int RevCounter::elasped_time()
 int RevCounter::count_interrupts()
 {
 	return count_interrupts_;
+}
+
+bool RevCounter::overflowed()
+{
+	return overflowed_;
 }
