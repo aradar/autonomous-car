@@ -22,6 +22,8 @@ float calculateDrive(float value_actual_speed, float value_target_speed);
 float calculateSteer(float valueSteer, Side side);
 
 void send_float(float f, Serial& ser);
+void send_int(int f, Serial& ser);
+
 void blink(float f);
 
 struct SerialInputProtocol {
@@ -155,14 +157,16 @@ void test_servos(Servo& drive, Servo& steer, DigitalOut& statusLed)
 	//wait(10);
 	float avg = 0.f;
 	RevCounter revCounter;
-	for (int i = 0; i < 300000; i++)
+
+	for (int i = 0; i < 2000; i++)
 	{
 		avg += revCounter.meters_per_second();
+		wait_ms(1);
 	}
 
 	drive = 0.5f;
 
-	avg = avg / 300000.f;
+	avg = avg / 2000;
 
 	send_float(avg, pi);
 
@@ -180,6 +184,15 @@ void send_float(float f, Serial& ser)
 {
 	uint8_t* p = (uint8_t*)&f;
 	for (int i = 0; i < sizeof(float); i++) {
+		ser.putc(*p);
+		p++;
+	}
+}
+
+void send_int(int i, Serial& ser)
+{
+	uint8_t* p = (uint8_t*)&i;
+	for (int i = 0; i < sizeof(int); i++) {
 		ser.putc(*p);
 		p++;
 	}
