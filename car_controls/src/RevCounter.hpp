@@ -14,8 +14,8 @@ public:
 	int count_interrupts();
 
 private:
-	static int cur_tick_;
-	static int prev_tick_;
+	static long long cur_tick_;
+	static long long prev_tick_;
 	static Timer timer_;
 	static int count_interrupts_;
 	InterruptIn pin_;
