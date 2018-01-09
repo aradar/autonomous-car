@@ -2,30 +2,29 @@
 #include <algorithm>
 #include "RevCounter.hpp"
 
-RevCounter::RevCounter()
-	: cur_tick_(0), prev_tick_(0)
-{
-	timer_.start();
-}
+InterruptIn pin(PA_11);
 
-void RevCounter::receive_tick(int time)
+int RevCounter::cur_tick_;
+int RevCounter::prev_tick_;
+Timer RevCounter::timer_;
+
+RevCounter::RevCounter()
+{}
+
+void RevCounter::receive_tick()
 {
+	int time = timer_.read_ms();
 	prev_tick_ = cur_tick_;
 	cur_tick_ = time;
 }
 
-void RevCounter::update()
+void RevCounter::start()
 {
-	static bool active = false;
-	bool pin = std::rand() % 2;
-	//DigitalIn pin(PA_11);
-
-	if (!active && pin) {
-		active = true;
-		receive_tick(timer_.read_ms());
-	} else if(active && !pin) {
-		active = false;
-	}
+	cur_tick_ = 0;
+	prev_tick_ = 0;
+	timer_.reset();
+	timer_.start();
+	pin.rise(&RevCounter::receive_tick);
 }
 
 float RevCounter::meters_per_second()
