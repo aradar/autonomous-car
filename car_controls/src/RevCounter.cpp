@@ -2,20 +2,20 @@
 #include <algorithm>
 #include "RevCounter.hpp"
 
-InterruptIn pin(PA_11);
-
 int RevCounter::cur_tick_;
 int RevCounter::prev_tick_;
 Timer RevCounter::timer_;
+int RevCounter::count_interrupts_;
 
 RevCounter::RevCounter()
+	: pin_(PA_11)
 {
 	start();
 }
 
 void RevCounter::receive_tick()
 {
-	countInterrupts++;
+	count_interrupts_++;
 	int time = timer_.read_ms();
 	prev_tick_ = cur_tick_;
 	cur_tick_ = time;
@@ -25,9 +25,10 @@ void RevCounter::start()
 {
 	cur_tick_ = 0;
 	prev_tick_ = 0;
+	count_interrupts_ = 0;
 	timer_.reset();
 	timer_.start();
-	pin.rise(&RevCounter::receive_tick);
+	pin_.rise(&RevCounter::receive_tick);
 }
 
 float RevCounter::meters_per_second()
@@ -51,4 +52,9 @@ float RevCounter::meters_per_second()
 int RevCounter::elasped_time()
 {
 	return timer_.read_ms();
+}
+
+int RevCounter::count_interrupts()
+{
+	return count_interrupts_;
 }
