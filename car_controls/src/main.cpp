@@ -110,9 +110,9 @@ float calculateSteer(float value_steer, Side side){
 
 float calculateDrive(float value_actual_speed, float value_target_speed)
 {
-    float b = 1;
-    float a = 0.04;
-    return b / (value_actual_speed * value_actual_speed + 1) * ((value_target_speed - value_actual_speed) * a) + 0.5;
+	float b = 1;
+	float a = 0.04;
+	return b / (value_actual_speed * value_actual_speed + 1) * ((value_target_speed - value_actual_speed) * a) + 0.5;
 }
 
 const int CALIBRATION_TIME = 2;
@@ -189,8 +189,6 @@ int main() {
         	state.actual_speed = rev.meters_per_second();
         	state.speed_changed = false;
 		}
-		
-		rev.update();	
 
 		// blink
 		/*blink_counter++;

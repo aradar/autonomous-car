@@ -9,14 +9,14 @@ class RevCounter {
 public:
 	RevCounter();
 
-	void update();
-	void receive_tick(int time);
+	static void receive_tick();
+	void start();
 	float meters_per_second();
 
 private:
-	int cur_tick_;
-	int prev_tick_;
-	Timer timer_;
+	static int cur_tick_;
+	static int prev_tick_;
+	static Timer timer_;
 };
 
 #endif
