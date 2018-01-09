@@ -164,6 +164,9 @@ void test_servos(Servo& drive, Servo& steer, DigitalOut& statusLed)
 		wait_ms(1);
 	}
 
+	send_int(revCounter.elasped_time(), pi);
+	send_int(countInterrupts, pi);
+
 	drive = 0.5f;
 
 	avg = avg / 2000;
@@ -191,11 +194,7 @@ void send_float(float f, Serial& ser)
 
 void send_int(int i, Serial& ser)
 {
-	uint8_t* p = (uint8_t*)&i;
-	for (int i = 0; i < sizeof(int); i++) {
-		ser.putc(*p);
-		p++;
-	}
+	send_float(i, ser);
 }
 
 void test_serial()
