@@ -156,20 +156,21 @@ void test_servos(Servo& drive, Servo& steer, DigitalOut& statusLed)
 
 	//wait(10);
 	float avg = 0.f;
-	RevCounter revCounter;
+	//RevCounter revCounter;
+	DigitalIn pin(PA_11);
 
-	for (int i = 0; i < 2000; i++)
+	for (int i = 0; i < 10000; i++)
 	{
-		avg += revCounter.meters_per_second();
-		wait_ms(1);
+		//avg += revCounter.meters_per_second();
+		//wait_ms();
+		send_int(pin, pi);
 	}
 
-	send_int(revCounter.elasped_time(), pi);
-	send_int(countInterrupts, pi);
+	//send_int(revCounter.elasped_time(), pi);
 
 	drive = 0.5f;
 
-	avg = avg / 2000;
+	avg = avg / 10000;
 
 	send_float(avg, pi);
 
