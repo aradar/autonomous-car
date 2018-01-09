@@ -18,6 +18,10 @@ class BoundingBox:
         self.width = width
         self.object_type = object_type
 
+    def __str__(self):
+        return "BoundingBox: left {}, right {}, top {}, bottom {}, height {}, width {}, object_type {}".format(
+            self.left, self.right, self.top, self.bottom, self.height, self.width, self.object_type)
+
 
 class DetectedObject:
     """
@@ -25,7 +29,7 @@ class DetectedObject:
     the position of the camera and the unit of measure is defined by the RelativeTranslator layer.
     """
 
-    def __init__(self, position: Tuple[float, float], radius: float, object_type : ObjectType):
+    def __init__(self, position: Tuple[float, float], radius: float, object_type: ObjectType):
         """
         :param position: relative position of the center of the object
         :param radius: radius of the object
