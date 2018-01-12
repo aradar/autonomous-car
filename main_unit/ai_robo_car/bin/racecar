@@ -3,10 +3,10 @@
 This is a test
 
 Usage:
-  main start <ipc_secret> [--address=<ipc_address>] [--port=<ipc_port>] [--frequency=<heart_frequency>] [--fork]
-  main pause <ipc_secret> [--address=<ipc_address>] [--port=<ipc_port>]
-  main resume <ipc_secret> [--address=<ipc_address>] [--port=<ipc_port>]
-  main stop <ipc_secret> [--address=<ipc_address>] [--port=<ipc_port>]
+  main start [<ipc_secret>] [--address=<ipc_address>] [--port=<ipc_port>] [--frequency=<heart_frequency>] [--fork]
+  main pause [<ipc_secret>] [--address=<ipc_address>] [--port=<ipc_port>]
+  main resume [<ipc_secret>] [--address=<ipc_address>] [--port=<ipc_port>]
+  main stop [<ipc_secret>] [--address=<ipc_address>] [--port=<ipc_port>]
   main (-h | --help)
 
 Options:
@@ -18,18 +18,12 @@ Options:
 
 """
 from multiprocessing.connection import Client
-
-import multiprocessing
-
-import os
-
-import sys
+from typing import Union
 from docopt import docopt
-from multiprocessing import Process
 
 from ai_robo_car.layer import ObjectRecognizer, RelativeTranslator, PathFinder, PathTranslator, EngineCommunicator
 from ai_robo_car.layer.test_layer import PrintTestLayer
-from ai_robo_car.layer_manager import Manager, RemoteControlCommand, RemoteControlMessage
+from ai_robo_car.layer_management import RemoteControlCommand, RemoteControlMessage, build_and_start_env
 
 
 def build_layers():
@@ -51,30 +45,27 @@ def build_layers():
     return layer1
 
 
-def start_server(fork: bool = True, **kwargs):
-    if fork:
-        pid = os.fork()
-        print(pid)
-        if pid == 0:
-            start_server_2(**kwargs)
-    else:
-        start_server_2(**kwargs)
+def encode_ipc_secret(ipc_secret: str) -> Union[bytes, None]:
+    encoded_ipc_secret = None
+    if ipc_secret is not None:
+        encoded_ipc_secret = ipc_secret.encode()
+
+    return encoded_ipc_secret
 
 
-def start_server_2(ipc_secret: str, heart_frequency: float = 30,
+def start_server(ipc_secret: str, heart_frequency: float = 30,
                  ipc_address: str = "localhost", ipc_port: int = 6789):
-    #highest_layer = build_layers() # should be put back before real usage
+    # highest_layer = build_layers() # should be put back before real usage
     highest_layer = PrintTestLayer()
-    manager = Manager(
+    build_and_start_env(
         highest_layer=highest_layer,
         frequency=heart_frequency,
-        ipc_secret=ipc_secret,
+        ipc_secret=encode_ipc_secret(ipc_secret),
         ipc_address=(ipc_address, ipc_port))
-    manager.start()
 
 
 def communicate_with_server(ipc_secret: str, ipc_address: str, ipc_port: int, command: RemoteControlCommand):
-    with Client((ipc_address, ipc_port), authkey=ipc_secret.encode()) as conn:
+    with Client((ipc_address, ipc_port), authkey=encode_ipc_secret(ipc_secret)) as conn:
         conn.send(RemoteControlMessage(command))
         conn.close()
 
@@ -84,7 +75,6 @@ if __name__ == "__main__":
     if arguments["start"]:
         start_server(
             ipc_secret=arguments["<ipc_secret>"],
-            fork=arguments["--fork"],
             heart_frequency=float(arguments["--frequency"]),
             ipc_address=arguments["--address"],
             ipc_port=int(arguments["--port"]))
