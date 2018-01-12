@@ -3,22 +3,22 @@
 
 #include <mbed.h>
 
+#include "RingBuffer.hpp"
+
 class RevCounter {
 public:
 	RevCounter();
 
 	static void receive_tick();
-	void start();
+	void reset();
 	float meters_per_second();
-	int elasped_time();
 	int count_interrupts();
-	bool overflowed();
+	static Timer timer_;
+	static RingBuffer<int, 100> buffer_;
 
 private:
-	static long long cur_tick_;
-	static long long prev_tick_;
-	static Timer timer_;
-	static bool overflowed_;
+	int count_occurrences_after(int time, int* first);
+
 	static int count_interrupts_;
 	InterruptIn pin_;
 

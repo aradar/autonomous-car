@@ -141,40 +141,39 @@ void calibrate(Servo& drive, Servo& steer, DigitalOut& statusLed) {
 void test_servos(Servo& drive, Servo& steer, DigitalOut& statusLed)
 {
 	// start
+	/*
 	for (float f = 0.35f; f < 0.65f; f += 0.005f)
 	{
 		steer = f;
 		wait_ms(15);
 	}
+	*/
 	steer = 0.5f;
 
 	// vorwaerts 
 	drive = 0.65f;
+
+	RevCounter revCounter;
 	blink(0.3f);
 
-	drive = 0.59f;
+	//revCounter.meters_per_second();
 
-	//wait(10);
-	float avg = 0.f;
-	//RevCounter revCounter;
-	DigitalIn pin(PA_11);
+	float drive_values[] = { 0.68f, 0.65f, 0.62f, 0.59f, 0.56f, 0.59f, 0.62f, 0.65f };
 
-	for (int i = 0; i < 10000; i++)
+	wait(1);
+
+	for (int cycle = 0; cycle < 3; cycle++)
 	{
-		//avg += revCounter.meters_per_second();
-		//wait_ms();
-		send_int(pin, pi);
+		for (int i = 0; i < 6; i++) {
+			drive = drive_values[i];
+			wait(0.3);
+			send_float(revCounter.meters_per_second(), pi);
+		}
 	}
-
-	//send_int(revCounter.elasped_time(), pi);
 
 	drive = 0.5f;
 
-	avg = avg / 10000;
-
-	send_float(avg, pi);
-
-	wait(2);
+	wait(1);
 
 	// end
 	for (int i = 0; i < 3; i++)
@@ -198,12 +197,6 @@ void send_int(int i, Serial& ser)
 	send_float(i, ser);
 }
 
-void test_serial()
-{
-	//pi.printf("test: %f", 42.f);
-	send_float(42.f, pi);
-}
-
 DigitalOut statusLed(LED1);
 
 void blink(float time) {
@@ -222,14 +215,13 @@ int main() {
 
 	// test
 	wait(1);
-	test_serial();
-	test_servos(drive, steer, statusLed);
+	//test_servos(drive, steer, statusLed);
 
 	/*
 	int blink_counter = 0;
 
-	state.current_speed = 0.f;
-	state.target_speed = 0.f;
+	state.current_speed = 0.5f;
+	state.target_speed = 0.5f;
 	RevCounter revCounter;
 	
     while(1) {
