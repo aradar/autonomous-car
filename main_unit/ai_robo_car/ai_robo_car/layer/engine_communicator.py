@@ -5,10 +5,11 @@ import serial
 import socket
 import math
 
+
 class EngineCommunicator(AbstractLayer[EngineInstruction, None]):
     def __init__(self, upper: AbstractLayer, lower: AbstractLayer, is_test_communication=False):
         super(EngineCommunicator, self).__init__(upper, lower)
-        self.is_test_communication = is_test_communication 
+        self.is_test_communication = is_test_communication
         if self.is_test_communication:
             self.ser = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.ser.connect(('127.0.0.1', 8000))
@@ -18,6 +19,10 @@ class EngineCommunicator(AbstractLayer[EngineInstruction, None]):
 
     def call_from_upper(self, engine_instruction: EngineInstruction) -> None:
         if self.ser is not None:
+            if engine_instruction is None:
+                # Todo: send break
+                return
+
             side = Side.LEFT if engine_instruction.steer < 0 else Side.RIGHT
             direction = Direction.BACKWARD if engine_instruction.speed < 0 else Direction.FORWARD
             steer = math.fabs(engine_instruction.steer)
