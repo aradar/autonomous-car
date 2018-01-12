@@ -39,26 +39,28 @@ class RelativeTranslator(AbstractLayer[List[BoundingBox], List[DetectedObject]])
         self.original_image_aspect_ratio = original_image_aspect_ratio
 
     def call_from_upper(self, bounding_boxes: List[BoundingBox]) -> None:
-        if self.lower is None:
-            return
+        if self.lower is not None:
+            if bounding_boxes is None:
+                self.call_lower(None)
+                return
 
-        detected_objects = []
-        for bounding_box in bounding_boxes:
-            if self.proportions_fit(bounding_box.width, bounding_box.height):
-                radius = bounding_box.width * 0.5
-                y = self.calc_y(bounding_box.bottom, radius)
-                x = self.calc_x(bounding_box.left, radius, y)
-                detected_objects.append(DetectedObject((x, y), radius, bounding_box.object_type))
+            detected_objects = []
+            for bounding_box in bounding_boxes:
+                if self.proportions_fit(bounding_box.width, bounding_box.height):
+                    radius = bounding_box.width * 0.5
+                    y = self.calc_y(bounding_box.bottom, radius)
+                    x = self.calc_x(bounding_box.left, radius, y)
+                    detected_objects.append(DetectedObject((x, y), radius, bounding_box.object_type))
 
-        if len(detected_objects) == 0:
-            detected_objects = None
+            if len(detected_objects) == 0:
+                detected_objects = None
 
-        self.call_lower(detected_objects)
+            self.call_lower(detected_objects)
 
     def call_from_lower(self, message: str) -> None:
         raise NotImplementedError
 
-    def proportions_fit(self, width: float, height: float, allowed_variance: float = 0.05) -> bool:
+    def proportions_fit(self, width: float, height: float, allowed_variance: float = 0.1) -> bool:
         """
         Checks if the proportions of the detected object fit those of a real cup.
 
@@ -68,7 +70,7 @@ class RelativeTranslator(AbstractLayer[List[BoundingBox], List[DetectedObject]])
         :return: if proportion of the object is in the allowed_variance range
         """
 
-        cup_proportion = 7.0 / 8.0   # width / height in cm
+        cup_proportion = 6.0 / 8.0   # width / height in cm, correct ratio would be 7.0 / 8.0
         object_proportion = width * self.original_image_aspect_ratio[0] / height * self.original_image_aspect_ratio[1]
         return isclose(cup_proportion, object_proportion, abs_tol=allowed_variance)
 

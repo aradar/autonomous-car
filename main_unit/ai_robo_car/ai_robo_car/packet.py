@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 
-# import serial
-from serial import Serial
-import sys
 import struct
 from enum import Enum
+
+from serial import Serial
 
 ##############################################
 #
@@ -25,20 +24,24 @@ from enum import Enum
 #
 ##############################################
 
-NULL_MASK 	= 0b00000000
-SIDE_MASK 	= 0b10000000
-DIRECTION_MASK 	= 0b01000000
-OPTION_MASK 	= 0b00111111
+NULL_MASK = 0b00000000
+SIDE_MASK = 0b10000000
+DIRECTION_MASK = 0b01000000
+OPTION_MASK = 0b00111111
+
 
 class Side(Enum):
     LEFT = 0
     RIGHT = 1
 
+
 class Direction(Enum):
     BACKWARD = 0
-    FORWARD = 1 
+    FORWARD = 1
+
 
 class Packetizer:
+    @staticmethod
     def create_header(side: Side, direction: Direction, debug_lvl: int):
         header = 0
         header |= SIDE_MASK if side == Side.RIGHT else NULL_MASK
@@ -46,9 +49,12 @@ class Packetizer:
         header |= OPTION_MASK & debug_lvl
         return header
 
+    @staticmethod
     def create_data(side: Side, direction: Direction, debug_lvl: int, value_steer: float, value_speed: float):
         header = Packetizer.create_header(side, direction, debug_lvl)
         return struct.pack("<Bff", header, value_steer, value_speed)
 
-    def write_data(serial: Serial, side: Side, direction: Direction, debug_lvl: int, value_steer: float, value_speed: float):
+    @staticmethod
+    def write_data(serial: Serial, side: Side, direction: Direction, debug_lvl: int, value_steer: float,
+                   value_speed: float):
         serial.write(Packetizer.create_data(side, direction, debug_lvl, value_steer, value_speed))

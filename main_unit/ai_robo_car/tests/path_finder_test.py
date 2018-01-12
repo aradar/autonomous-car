@@ -41,7 +41,7 @@ class PathFinderTester(unittest.TestCase):
     def test_yellow_missing(self):
         gen_objects = PathFinderTester.generate_sample_objects_without_yellow()
         self.path_finder.call_from_upper(gen_objects)
-        self.assertEqual((0, 0), self.test_layer.message_from_upper.position)
+        self.assertEqual(None, self.test_layer.message_from_upper)
 
 
 if __name__ == '__main__':
