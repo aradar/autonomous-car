@@ -29,7 +29,8 @@ void RevCounter::reset()
 
 // do not give "first" a null pointer
 // buffer.size() > 0
-int RevCounter::count_occurrences_after(int time, int* first) {
+int RevCounter::count_occurrences_after(int time, int* first) const
+{
 	int count = 0;
 
 	*first = buffer_[0];
@@ -45,7 +46,7 @@ int RevCounter::count_occurrences_after(int time, int* first) {
 	return count;
 }
 
-float RevCounter::meters_per_second()
+float RevCounter::meters_per_second() const
 {
 	const float METERS_PER_REV = 0.23f;
 	const int TICKS_PER_REV = 4;
@@ -73,7 +74,7 @@ float RevCounter::meters_per_second()
 	return (count * METERS_PER_TICK * 1000.f) / std::max<int>(MONITORING_PERIOD_MS, now - first);
 }
 
-int RevCounter::count_interrupts()
+int RevCounter::count_interrupts() const
 {
 	return count_interrupts_;
 }

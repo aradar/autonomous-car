@@ -11,17 +11,16 @@ public:
 
 	static void receive_tick();
 	void reset();
-	float meters_per_second();
-	int count_interrupts();
+	float meters_per_second() const;
+	int count_interrupts() const;
 	static Timer timer_;
 	static RingBuffer<int, 100> buffer_;
 
 private:
-	int count_occurrences_after(int time, int* first);
+	int count_occurrences_after(int time, int* first) const;
 
 	static int count_interrupts_;
 	InterruptIn pin_;
-
 };
 
 #endif
