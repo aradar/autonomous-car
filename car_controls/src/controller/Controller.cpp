@@ -15,20 +15,24 @@ float Controller::meters_per_second() const
 	return rev_counter.meters_per_second();
 }
 
+const float LEVEL_OF_APPROXIMATION = 0.7f; // should be between 0.f and 1.f
+
 float Controller::meters_per_second_approx() const
 {
-	// calculate the average of the last drive-values
-	float avg_drive = 0.f;
-	for (unsigned int i = 0; i < drive_buffer.size(); i++) {
-		avg_drive += drive_buffer[i];
+	if (drive_buffer.size == 0) {
+		return meters_per_second();
 	}
 
-	avg_drive = avg_drive / drive_buffer.size();
+	// calculate a value representing the last drives
+	float drive_representation = drive_buffer[0];
+	for (unsigned int i = 0; i < drive_buffer.size(); i++) {
+		drive_representation = (drive_representation + drive_buffer[i]) / 2.f;
+	}
 
-	const float target_speed = drive_to_speed(avg_drive);
-	const float approx_speed = (target_speed + meters_per_second()) / 2.f;
-
-	return approx_speed;
+	const float approx_speed = drive_to_speed(drive_representation);
+	const float measured_speed = meters_per_second();
+	return LEVEL_OF_APPROXIMATION * approx_speed + // approx
+		(1.f - LEVEL_OF_APPROXIMATION) * measured_speed; // measured
 }
 
 float Controller::calculate_steer(float value_steer, Side side)
