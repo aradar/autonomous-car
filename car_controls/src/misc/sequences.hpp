@@ -5,7 +5,6 @@
 
 namespace sequences
 {
-	void blink(float time);
 	void calibrate();
 	void test_steer(Servo& steer);
 	void test_drive(Servo& drive);
