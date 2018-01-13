@@ -1,0 +1,25 @@
+pkgname=libpixyusb
+pkgver=2.0.17
+pkgrel=0
+pkgdesc="Library of the pixycam"
+arch=('i686' 'x86_64')
+url="https://github.com/charmedlabs/pixy"
+depends=('boost' 'swig')
+source=("https://github.com/charmedlabs/pixy/archive/Firmware-${pkgver}.tar.gz")
+md5sums=('a1800960f26566cff38c92f6da0492bb')
+sha256sums=('e431dab520b58b3ddcb7c9c4323fc8d6677bede8a9c63e705582d1e2645cf894')
+
+build() {
+	cd "${srcdir}/pixy-Firmware-${pkgver}/scripts/" 
+	sh build_libpixyusb.sh
+}
+
+package() {	
+	cd "${srcdir}/pixy-Firmware-${pkgver}/build/${pkgname}/" 
+  	install -D "${pkgname}.a" "$pkgdir/usr/local/lib/${pkgname}.a"
+	
+	cd "${srcdir}/pixy-Firmware-${pkgver}/src/" 
+	install -D "host/${pkgname}/include/pixy.h" "${pkgdir}/usr/local/include/pixy.h"
+	install -D "common/inc/pixydefs.h" "${pkgdir}/usr/local/include/pixydefs.h"
+}
+
