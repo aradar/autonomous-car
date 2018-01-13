@@ -3,7 +3,7 @@
 import unittest
 
 from ai_robo_car.layer import PathTranslator
-from ai_robo_car.layer.data_objects import TargetPoint, EngineInstruction
+from ai_robo_car.layer.data_objects import TargetPoint
 from ai_robo_car.layer.test_layer import TestLayer
 
 

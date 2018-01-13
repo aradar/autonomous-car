@@ -67,7 +67,7 @@ class ObjectRecognizer(AbstractLayer[str, str]):
         super().__init__(upper, lower)
         init_value = pixy_init()
         if init_value is not 0:
-            print("pixy cam could not be initialized error:",init_value) # todo remove
+            print("pixy cam could not be initialized error:", init_value)  # todo remove
 
     def call_from_upper(self, message: str) -> None:
         bounding_boxes = []
