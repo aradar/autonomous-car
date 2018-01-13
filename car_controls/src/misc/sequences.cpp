@@ -1,9 +1,9 @@
 #include "sequences.hpp"
 
-#include "RevCounter.hpp"
-#include "NetworkManager.hpp"
+#include "../controller/RevCounter.hpp"
+#include "../network/NetworkManager.hpp"
 
-#include "LEDHandler.hpp"
+#include "../debug/LEDHandler.hpp"
 
 namespace sequences {
 	const float CALIBRATION_TIME = 2.f;

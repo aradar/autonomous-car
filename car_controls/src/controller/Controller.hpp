@@ -1,8 +1,8 @@
 #ifndef __CONTROLLER_CLASS__
 #define __CONTROLLER_CLASS__
 
-#include "directions.hpp"
-#include "RevCounter.hpp"
+#include "../misc/directions.hpp"
+#include "../controller/RevCounter.hpp"
 
 /*
  * The Controller has the following functions:

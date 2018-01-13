@@ -2,7 +2,7 @@
 #define __SERIALINPUTPROTOCOL_CLASS__
 
 #include "mbed.h"
-#include "directions.hpp"
+#include "../misc/directions.hpp"
 
 uint8_t const SIDE_MASK = 0x80;
 uint8_t const DIRECTION_MASK = 0x40;

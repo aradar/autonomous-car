@@ -4,9 +4,9 @@
 #include "Servo.h"
 #include "mbed.h"
 
-#include "Controller.hpp"
-#include "CarState.hpp"
-#include "NetworkManager.hpp"
+#include <controller/Controller.hpp>
+#include <misc/CarState.hpp>
+#include <network/NetworkManager.hpp>
 
 class Main
 {

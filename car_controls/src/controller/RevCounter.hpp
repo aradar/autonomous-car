@@ -3,7 +3,7 @@
 
 #include <mbed.h>
 
-#include "RingBuffer.hpp"
+#include "../misc/RingBuffer.hpp"
 
 class RevCounter {
 public:

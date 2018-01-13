@@ -2,8 +2,8 @@
 
 #include "Servo.h"
 
-#include "sequences.hpp"
-#include "LEDHandler.hpp"
+#include <misc/sequences.hpp>
+#include <debug/LEDHandler.hpp>
 
 Main::Main()
 	: drive(PA_12), steer(PB_0)
@@ -21,6 +21,7 @@ void Main::run()
 	sequences::test_drive(drive);
 
 	int blink_counter = 0;
+	int blink_period = 1000;
 
 	state.target_speed = 1.5f;
 	state.steer_changed = true;
@@ -45,7 +46,7 @@ void Main::run()
 		LEDHandler::update();
      	
 		// blink
-		blink_counter = (blink_counter + 1) % 1000;
+		blink_counter = (blink_counter + 1) % blink_period;
 		if (blink_counter == 0) {
 			LEDHandler::toggle();
 			//send_float(state.current_speed, pi);

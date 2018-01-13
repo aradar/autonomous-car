@@ -1,7 +1,7 @@
 #include "NetworkManager.hpp"
 
 #include "SerialInputProtocol.hpp"
-#include "CarState.hpp"
+#include "../misc/CarState.hpp"
 
 Serial NetworkManager::pi(PB_6, PB_7, 9600); //UART1_TX / D4, UART1_RX / D5
 

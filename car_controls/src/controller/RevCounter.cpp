@@ -1,6 +1,7 @@
+#include "RevCounter.hpp"
+
 #include <vector>
 #include <algorithm>
-#include "RevCounter.hpp"
 
 RingBuffer<int, 100> RevCounter::buffer_;
 Timer RevCounter::timer_;
