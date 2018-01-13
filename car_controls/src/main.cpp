@@ -1,6 +1,7 @@
 #include "mbed.h"
 #include "Servo.h"
 #include <string>
+#include <math.h>
 
 #include "RevCounter.hpp"
 
@@ -11,7 +12,6 @@ uint8_t const DEBUG_MASK = ~(SIDE_MASK | DIRECTION_MASK);
 bool received_something = false;
 int wait_millis = 0;
 
-//Serial pc(USBTX, USBRX); // tx, rx
 Serial pi(PB_6, PB_7, 9600); //UART1_TX / D4, UART1_RX / D5
 
 enum Side { LEFT, RIGHT };
@@ -111,13 +111,29 @@ float calculateSteer(float value_steer, Side side){
 		return 0.4 + (value_steer/10);
 	}
 }
+float speed_to_drive(float target)
+{
+    float acceleration = 0.00035f;
+    float max_null_drive = 0.55f;
+    if (target == 0.f)
+        return 0.5f;
+    return acceleration * target * target + max_null_drive;
+}
 
+float calculateDrive(float current, float target)
+{
+    float acceleration = 0.05;
+    return acceleration * (target - current) + speed_to_drive(target);
+}
+
+/*
 float calculateDrive(float value_actual_speed, float value_target_speed)
 {
 	float b = 1;
-	float a = 0.04;
-	return b / (value_actual_speed * value_actual_speed + 1) * ((value_target_speed - value_actual_speed) * a) + 0.5;
+	float a = 0.25;
+	return b / (value_actual_speed * value_actual_speed + 1) * ((value_target_speed - value_actual_speed) * a) + 0.57;
 }
+*/
 
 const int CALIBRATION_TIME = 2;
 
@@ -154,21 +170,17 @@ void test_servos(Servo& drive, Servo& steer, DigitalOut& statusLed)
 	drive = 0.65f;
 
 	RevCounter revCounter;
-	blink(0.3f);
+	blink(1.f);
 
 	//revCounter.meters_per_second();
-
-	float drive_values[] = { 0.68f, 0.65f, 0.62f, 0.59f, 0.56f, 0.59f, 0.62f, 0.65f };
+	drive = 0.57f;
 
 	wait(1);
 
-	for (int cycle = 0; cycle < 3; cycle++)
+	for (int cycle = 0; cycle < 6; cycle++)
 	{
-		for (int i = 0; i < 6; i++) {
-			drive = drive_values[i];
-			wait(0.3);
-			send_float(revCounter.meters_per_second(), pi);
-		}
+		wait(1.0);
+		send_float(revCounter.meters_per_second(), pi);
 	}
 
 	drive = 0.5f;
@@ -186,7 +198,7 @@ void test_servos(Servo& drive, Servo& steer, DigitalOut& statusLed)
 void send_float(float f, Serial& ser)
 {
 	uint8_t* p = (uint8_t*)&f;
-	for (int i = 0; i < sizeof(float); i++) {
+	for (unsigned int i = 0; i < sizeof(float); i++) {
 		ser.putc(*p);
 		p++;
 	}
@@ -205,6 +217,29 @@ void blink(float time) {
 	statusLed = 0;
 }
 
+RingBuffer<float, 100> drive_buffer;
+
+void add_drive_value(float drive) {
+	drive_buffer << drive;
+}
+
+float drive_to_speed(float drive)
+{
+    float t = drive - 0.55;
+    if (t < 0.f)
+        return 0.f;
+    return std::sqrt(t / 0.00035);
+}
+
+float approx_speed(float current_speed) {
+	float avg = 0.f;
+	for (unsigned int i = 0; i < drive_buffer.size(); i++) {
+		avg += drive_buffer[i];
+	}
+
+	avg = avg / drive_buffer.size();
+}
+
 int main() {
     //pi.attach(rx_interrupt, Serial::RxIrq);
     //pi.attach(&rx_interrupt);
@@ -212,17 +247,27 @@ int main() {
 	Servo drive(PA_12);
 	Servo steer(PB_0);
 	calibrate(drive, steer, statusLed);
+	//
+	steer = 0.5f;
 
 	// test
 	wait(1);
 	//test_servos(drive, steer, statusLed);
+	//
+	drive = 0.65f;
+
+	wait(2);
+	drive = 0.5f;
 
 	/*
 	int blink_counter = 0;
 
-	state.current_speed = 0.5f;
-	state.target_speed = 0.5f;
+	state.current_speed = 0.0f;
+	state.target_speed = 1.5f;
+
 	RevCounter revCounter;
+
+	state.steer_changed = true;
 	
     while(1) {
 		state.current_speed = revCounter.meters_per_second();
@@ -231,16 +276,16 @@ int main() {
             steer = calculateSteer(state.steer, state.side);
             state.steer_changed = false;
         }
-        if (state.speed_changed) {
-            drive = calculateDrive(state.current_speed, state.target_speed);
-            state.speed_changed = false;
-        }        
+
+		drive = calculateDrive(state.current_speed, state.target_speed);
      	
 		// blink
 		blink_counter++;
-		blink_counter = blink_counter % 2000;
+		blink_counter = blink_counter % 1000;
 		if (blink_counter == 0) {
 			statusLed = !statusLed;
+			//send_float(state.current_speed, pi);
+			//send_float(drive, pi);
 		}
     }
 	*/
