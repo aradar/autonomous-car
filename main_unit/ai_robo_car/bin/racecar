@@ -24,25 +24,30 @@ from docopt import docopt
 from ai_robo_car.layer import ObjectRecognizer, RelativeTranslator, PathFinder, PathTranslator, EngineCommunicator
 from ai_robo_car.layer.test_layer import PrintTestLayer
 from ai_robo_car.layer_management import RemoteControlCommand, RemoteControlMessage, build_and_start_env
+from tests.engine_communicator_test import EngineCommunicatorServer
 
 
 def build_layers():
-    layer1 = ObjectRecognizer(None, None)
-    layer2 = RelativeTranslator(None, None)
-    layer3 = PathFinder(None, None)
-    layer4 = PathTranslator(None, None)
-    layer5 = EngineCommunicator(None, None)
+    object_recognizer = ObjectRecognizer(None, None)
+    relative_translator = RelativeTranslator(None, None, camera_height=0.012, camera_position_angle=80,
+                                             camera_x_view_angle=150, camera_y_view_angle=94)
+    path_finder = PathFinder(None, None)
+    path_translator = PathTranslator(None, None)
+    #engine_communicator_server = EngineCommunicatorServer(-1)
+    #engine_communicator_server.start()
+    #engine_communicator = EngineCommunicator(None, None, True)
+    engine_communicator = EngineCommunicator(None, None, False)
 
-    layer1.lower = layer2
-    layer2.lower = layer3
-    layer3.lower = layer4
-    layer4.lower = layer5
-    layer2.upper = layer1
-    layer3.upper = layer2
-    layer4.upper = layer3
-    layer5.upper = layer4
+    object_recognizer.lower = relative_translator
+    relative_translator.lower = path_finder
+    relative_translator.upper = object_recognizer
+    path_finder.lower = path_translator
+    path_finder.upper = relative_translator
+    path_translator.lower = engine_communicator
+    path_translator.upper = path_finder
+    engine_communicator.upper = path_translator
 
-    return layer1
+    return object_recognizer
 
 
 def encode_ipc_secret(ipc_secret: str) -> Union[bytes, None]:
@@ -55,8 +60,7 @@ def encode_ipc_secret(ipc_secret: str) -> Union[bytes, None]:
 
 def start_server(ipc_secret: str, heart_frequency: float = 30,
                  ipc_address: str = "localhost", ipc_port: int = 6789):
-    # highest_layer = build_layers() # should be put back before real usage
-    highest_layer = PrintTestLayer()
+    highest_layer = build_layers()
     build_and_start_env(
         highest_layer=highest_layer,
         frequency=heart_frequency,
