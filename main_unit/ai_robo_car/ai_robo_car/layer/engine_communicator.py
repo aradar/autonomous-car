@@ -38,20 +38,23 @@ class EngineCommunicator(AbstractLayer[EngineInstruction, None]):
         """
         if self.ser is not None:
             if engine_instruction is None:
-                # Todo: send break
-                return
+                data = self.package_engine_instruction(EngineInstruction(0., 0.)) # break
+            else:
+                data = self.package_engine_instruction(engine_instruction)
 
-            side = Side.LEFT if engine_instruction.steer < 0 else Side.RIGHT
-            direction = Direction.BACKWARD if engine_instruction.speed < 0 else Direction.FORWARD
-            steer = math.fabs(engine_instruction.steer)
-            speed = math.fabs(engine_instruction.speed)
-
-            data = Packetizer.create_data(side, direction, 0, steer, speed)
             logger.debug("produced {}".format(pformat(data)))
             if self.is_test_communication:
                 self.ser.send(data)
             else:
                 self.ser.write(data)
+
+    def package_engine_instruction(self, engine_instruction):
+        side = Side.LEFT if engine_instruction.steer < 0 else Side.RIGHT
+        direction = Direction.BACKWARD if engine_instruction.speed < 0 else Direction.FORWARD
+        steer = math.fabs(engine_instruction.steer)
+        speed = math.fabs(engine_instruction.speed)
+        data = Packetizer.create_data(side, direction, 0, steer, speed)
+        return data
 
     def call_from_lower(self, message: str) -> None:
         print("EngineCommunicator: call_from_lower -> " + message)
@@ -63,3 +66,18 @@ class EngineCommunicator(AbstractLayer[EngineInstruction, None]):
         Closes the serial port
         """
         self.ser.close()
+
+    def send_break(self) -> None:
+        if self.ser is not None:
+            logger.info("breaking (paused/stopped)")
+            data = self.package_engine_instruction(EngineInstruction(0., 0.))
+            if self.is_test_communication:
+                self.ser.send(data)
+            else:
+                self.ser.write(data)
+
+    def pause(self) -> None:
+        self.send_break()
+
+    def stop(self) -> None:
+        self.send_break()
