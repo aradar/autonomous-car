@@ -101,15 +101,18 @@ void rx_interrupt() {
     }
 }
 
-float calculateSteer(float value_steer, Side side){
-	if (value_steer > 0.4){
-		value_steer=0.4;
-	}
+float calculateSteer(float steer_Degree, Side side){
+	float steer_value;
 	if (side == LEFT){
-		return 0.4 - (value_steer/10);
+		steer_value = 0.5 + steer_Degree * 0.0075 ;
 	}else{
-		return 0.4 + (value_steer/10);
+		steer_value = 0.5 - steer_Degree * 0.0075;
 	}
+	if (steer_value > 0.8)
+		steer_value = 0.8;
+	if (steer_value < 0.2)
+		steer_value = 0.2;
+	return steer_value;
 }
 
 float calculateDrive(float value_actual_speed, float value_target_speed)
@@ -205,26 +208,65 @@ void blink(float time) {
 	statusLed = 0;
 }
 
+bool emergencyStop(){
+	Timer sonar;			
+	int distance = 0;
+	
+	DigitalIn echo_one(PA_8);		// sensor 1
+	DigitalOut trig_one(PF_1);		// sensor 1
+	DigitalIn echo_two(PF_0);		// sensor 2
+	DigitalOut trig_two(PB_5);		// sensor 2
+		
+	trig_one = 1;					// send trigger signal for sensor 1
+	sonar.reset();
+	wait_us(10.0);
+    trig_one = 0;					
+    while (echo_one==0) {};			// wait for echo signal
+    sonar.start();
+    while (echo_one==1) {};	
+    sonar.stop();					// stops time echo needed	
+    distance = (sonar.read_us())/58.0;	// distance between 
+	printf("First: %d cm \n\r", distance);
+	if(distance < 40)
+		return true;
+	
+	wait_us(10.0);
+	
+	trig_two = 1;					//send trigger signal for sensor 2
+	sonar.reset();
+    wait_us(10.0);
+    trig_two = 0;
+    while (echo_two==0) {};
+    sonar.start();
+    while (echo_two==1) {};
+    sonar.stop();
+    distance = (sonar.read_us())/58.0;
+	printf("Second: %d cm \n\r", distance);
+	if(distance < 40)
+		return true;
+	
+	return false;
+}
+
 int main() {
     //pi.attach(rx_interrupt, Serial::RxIrq);
     //pi.attach(&rx_interrupt);
 
 	Servo drive(PA_12);
 	Servo steer(PB_0);
-	calibrate(drive, steer, statusLed);
-
+	//calibrate(drive, steer, statusLed);
 	// test
-	wait(1);
 	//test_servos(drive, steer, statusLed);
 
-	/*
 	int blink_counter = 0;
 
 	state.current_speed = 0.5f;
 	state.target_speed = 0.5f;
 	RevCounter revCounter;
 	
-    while(1) {
+    while(!emergencyStop()) {
+		//printf(emergencyStop());
+		/*
 		state.current_speed = revCounter.meters_per_second();
 
         if (state.steer_changed) {
@@ -235,13 +277,14 @@ int main() {
             drive = calculateDrive(state.current_speed, state.target_speed);
             state.speed_changed = false;
         }        
-     	
+		
 		// blink
 		blink_counter++;
 		blink_counter = blink_counter % 2000;
 		if (blink_counter == 0) {
 			statusLed = !statusLed;
-		}
+		}*/
+		blink(0.5);
     }
-	*/
+    drive = 0;
 }
