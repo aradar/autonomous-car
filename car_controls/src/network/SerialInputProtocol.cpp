@@ -1,5 +1,8 @@
 #include "SerialInputProtocol.hpp"
 
+#include "NetworkManager.hpp"
+#include "../misc/CarState.hpp"
+
 SerialInputProtocol SerialInputProtocol::read(uint8_t* buffer) {
 	SerialInputProtocol result;
 	
@@ -8,8 +11,16 @@ SerialInputProtocol SerialInputProtocol::read(uint8_t* buffer) {
 	result.direction = (options & DIRECTION_MASK) == DIRECTION_MASK ? FORWARD : BACKWARD ;
 	result.debugLevel = DEBUG_MASK & options;
 
-	result.value_steer = *((float*) buffer+1);
-	result.value_speed = - *((float*) buffer+5);
-		 
+	result.value_steer = *(reinterpret_cast<float*> (buffer+1));
+	result.value_speed = *(reinterpret_cast<float*> (buffer+5));
+
 	return result;
+}
+
+void SerialInputProtocol::update_car_state(CarState* car_state) const
+{
+	car_state->side = this->side;
+	car_state->steer = this->value_steer;
+	car_state->steer_changed = true;
+	car_state->target_speed = this->value_speed;
 }

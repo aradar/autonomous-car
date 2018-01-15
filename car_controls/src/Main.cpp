@@ -30,7 +30,7 @@ void Main::run()
 	*/
 
 	int blink_counter = 0;
-	const int blink_period = 50;
+	const int blink_period = 250;
 
 	state.target_speed = 0.f;
 	state.steer_changed = true;
@@ -62,7 +62,8 @@ void Main::run()
 			LEDHandler::toggle();
 			//NetworkManager::send(state.current_speed);
 			//NetworkManager::send(state.target_speed);
-			//NetworkManager::send(drive);
+			//NetworkManager::send(state.steer);
+			NetworkManager::send((float)state.side);
 		}
 
 		wait(0.01f);

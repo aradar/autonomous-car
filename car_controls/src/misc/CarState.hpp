@@ -4,7 +4,7 @@
 #include "directions.hpp"
 
 struct CarState {
-	CarState() {}
+	CarState();
 	void update_from(const CarState& other);
 
 	float steer;

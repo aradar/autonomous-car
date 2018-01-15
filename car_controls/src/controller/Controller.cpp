@@ -5,6 +5,9 @@
 const int Controller::DRIVE_BUFFER_SIZE;
 const int Controller::NUM_SKIP_FRAMES = 100;
 
+const float Controller::MAX_STEER_VALUE = 0.7f;
+const float Controller::MIN_STEER_VALUE = 1-Controller::MAX_STEER_VALUE;
+
 void Controller::update(float drive)
 {
 	update_drive_values(drive);
@@ -42,10 +45,10 @@ float Controller::calculate_steer(float steer_Degree, Side side){
 	}else{
 		steer_value = 0.5 - steer_Degree * 0.0075;
 	}
-	if (steer_value > 0.8)
-		steer_value = 0.8;
-	if (steer_value < 0.2)
-		steer_value = 0.2;
+	if (steer_value > MAX_STEER_VALUE)
+		steer_value = MAX_STEER_VALUE;
+	if (steer_value < MIN_STEER_VALUE)
+		steer_value = MIN_STEER_VALUE;
 	return steer_value;
 }
 

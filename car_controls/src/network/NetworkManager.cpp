@@ -5,6 +5,9 @@
 
 Serial NetworkManager::pi(PB_6, PB_7, 9600); //UART1_TX / D4, UART1_RX / D5
 
+float NetworkManager::test_value1 = 0.f;
+float NetworkManager::test_value2 = 0.f;
+
 NetworkManager::NetworkManager()
 {}
 
@@ -14,35 +17,27 @@ uint8_t rx_buffer[BUFFER_SIZE];
 
 CarState car_state_tmp;
 
-void serialReadCallback() {
-	SerialInputProtocol input = SerialInputProtocol::read(rx_buffer);
-
-	car_state_tmp.target_speed = input.value_speed;
-	car_state_tmp.steer = input.value_steer;
-	car_state_tmp.steer_changed = true;
-
-	NetworkManager::send(car_state_tmp.target_speed);
+void serialReadCallback(uint8_t* fixed_buffer) {
+	SerialInputProtocol input = SerialInputProtocol::read(fixed_buffer);
+	input.update_car_state(&car_state_tmp);
 }
 
-int rx_buffer_size = 0;
+int rx_buffer_index = 0;
 
 void rx_interrupt() {
-	rx_buffer[rx_buffer_size] = NetworkManager::pi.getc();
+	rx_buffer[rx_buffer_index] = NetworkManager::pi.getc();
 	
-	rx_buffer_size++;
-	rx_buffer_size = rx_buffer_size % BUFFER_SIZE;
-	if (rx_buffer_size == 0) {
+	rx_buffer_index = (rx_buffer_index + 1) % BUFFER_SIZE;
+	if (rx_buffer_index == 0) {
 		
 		// echo
 		for (int i = 0; i < BUFFER_SIZE; ++i) {
 			NetworkManager::pi.putc(rx_buffer[i]);
 		}
-		NetworkManager::pi.putc('\n');
-		
-		serialReadCallback();
+
+		serialReadCallback(rx_buffer);
 	}
 }
-
 
 // public stuff ############
 

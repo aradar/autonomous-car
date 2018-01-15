@@ -24,6 +24,9 @@ class Controller
 		static const int DRIVE_BUFFER_SIZE = 10;
 		static const int NUM_SKIP_FRAMES;
 
+		static const float MAX_STEER_VALUE;
+		static const float MIN_STEER_VALUE;
+
 		void update(float drive);
 
 		float meters_per_second() const;

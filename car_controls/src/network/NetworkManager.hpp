@@ -20,6 +20,9 @@ class NetworkManager
 		static void update_car_state(CarState* car_state);
 
 		static Serial pi;
+
+		static float test_value1;
+		static float test_value2;
 };
 
 #endif
