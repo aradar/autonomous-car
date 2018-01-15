@@ -10,6 +10,9 @@ logger = logging.getLogger(__name__)
 
 
 class Blocks(Structure):
+    """
+    Represents the objects recognized by the pixy cam. (object structure provided by the pixy cam)
+    """
     _fields_ = [("type", c_uint),
                 ("signature", c_uint),
                 ("x", c_uint),
@@ -25,10 +28,21 @@ frame = 0
 
 
 def normalize_values(value, max_value) -> float:
+    """
+    Normalizes values. Calculated values are equal to/ greater than 0 and equal to/ smaller than 1.
+    :param value: value to be normalized
+    :param max_value: max value (not normalized, normalized it would be 1)
+    :return: normalized value
+    """
     return value / max_value
 
 
 def create_bounding_box(block: Block) -> BoundingBox:
+    """
+    Converts block into bounding box. (/Creates bounding box from block.)
+    :param block: block provideed by pixy cam, to be converted into bounding box
+    :return: created bounding box
+    """
     bounding_box = BoundingBox(
         normalize_values(block.x, 320) - normalize_values(block.width, 320) / 2,  # left
         normalize_values(block.x, 320) + normalize_values(block.width, 320) / 2,  # right
@@ -42,6 +56,14 @@ def create_bounding_box(block: Block) -> BoundingBox:
 
 
 def is_bounding_box_valid(bounding_box: BoundingBox) -> bool:
+    """
+    Checks if bounding box is valid. A bounding box is valid, if not all parameters are zero and all parameters are
+    greater than zero and smaller than one.
+    :param bounding_box: bounding box to be checked
+    :return:
+            true    if bounding box is valid
+            false   if bounding box is not valid
+    """
     is_zero = bounding_box.left == 0
     is_zero = is_zero and bounding_box.right == 0
     is_zero = is_zero and bounding_box.width == 0
@@ -68,6 +90,11 @@ def is_bounding_box_valid(bounding_box: BoundingBox) -> bool:
 
 
 class ObjectRecognizer(AbstractLayer[str, str]):
+    """
+    This layer uses the pixy cam to recognize objects. It produces a list of bounding boxes. Each bounding box
+    contains its coordinates, dimensions and object type and represents a recognized object.
+    """
+
     def __init__(self, upper: AbstractLayer, lower: AbstractLayer):
         super().__init__(upper, lower)
         logger.info("initializing pixy cam")
