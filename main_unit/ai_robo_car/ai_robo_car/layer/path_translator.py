@@ -5,7 +5,19 @@ import math
 
 
 class PathTranslator(AbstractLayer[TargetPoint, EngineInstruction]):
+    """
+    This layer receives a point relative to the car which is located on a 2D plane (on the ground).
+    Steer und speed values are gained through extensive algorithms with a complexity superior to anything a human brain can possibly grasp.
+    Those values are then passed to the EngineCommunicator
+    """
+
     def call_from_upper(self, target_point: TargetPoint) -> None:
+        """
+        'angle': steering angle from    0(deg) to 360(deg). 0(deg) is located at 0(rad)
+        'steer': steering angle from -180(deg) to 180(deg). 0(deg) is located at 0.5(rad)
+        'threshold_angle': defines the area of possible angles between threshold(deg) to 180-threshold(deg)
+        """
+
         if self.lower is not None:
             if target_point is None:
                 self.call_lower(None)
