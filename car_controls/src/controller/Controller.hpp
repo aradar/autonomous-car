@@ -1,6 +1,8 @@
 #ifndef __CONTROLLER_CLASS__
 #define __CONTROLLER_CLASS__
 
+#include <deque>
+
 #include "../misc/directions.hpp"
 #include "../controller/RevCounter.hpp"
 
@@ -11,6 +13,7 @@
  *  - calculates the steer value adapted to the target steer
  *  - converts drive to speed values
  *  - converts speed to drive values
+ *  - Speed Prediction
  *
  *  Maybe split speed measurement and drive/steer calculations
  */
@@ -18,7 +21,7 @@
 class Controller
 {
 	public:
-		static const int DRIVE_BUFFER_SIZE = 100;
+		static const int DRIVE_BUFFER_SIZE = 10;
 		static const int NUM_SKIP_FRAMES;
 
 		void update(float drive);
@@ -33,7 +36,7 @@ class Controller
 		void update_drive_values(float drive);
 	private:
 		int skip_frames_counter;
-		RingBuffer<int, DRIVE_BUFFER_SIZE> drive_buffer;
+		std::deque<int> drive_buffer;
 		RevCounter rev_counter;
 };
 

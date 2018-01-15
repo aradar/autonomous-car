@@ -11,21 +11,25 @@ Main::Main()
 
 void Main::run()
 {
-	network_manager.init();
-
+	// calibrate
 	sequences::calibrate();
 
 	// test
+
 	wait(1);
+	/*
 	sequences::test_steer(steer);
 	sequences::test_drive(drive);
+	*/
 
 	int blink_counter = 0;
-	int blink_period = 1000;
+	const int blink_period = 50;
 
-	state.target_speed = 1.5f;
+	state.target_speed = 0.5f;
 	state.steer_changed = true;
-	
+
+	network_manager.init(state);
+
     while(1) {
 		controller.update(drive);
 
@@ -49,8 +53,11 @@ void Main::run()
 		blink_counter = (blink_counter + 1) % blink_period;
 		if (blink_counter == 0) {
 			LEDHandler::toggle();
-			//send_float(state.current_speed, pi);
-			//send_float(drive, pi);
+			network_manager.send(state.current_speed);
+			network_manager.send(state.target_speed);
+			network_manager.send(drive);
 		}
+
+		wait(0.01f);
     }
 }

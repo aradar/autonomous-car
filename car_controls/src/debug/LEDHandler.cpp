@@ -26,11 +26,12 @@ void LEDHandler::blink_async(int ticks)
 
 void LEDHandler::update()
 {
-	if (blink_counter > 0)
+	if (blink_counter > 0) {
 		blink_counter--;
 
-	if (blink_counter == 0) {
-		status_led = 0;
+		if (blink_counter == 0) {
+			status_led = 0;
+		}
 	}
 }
 

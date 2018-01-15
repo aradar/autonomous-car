@@ -3,7 +3,7 @@
 #include <cmath>
 
 const int Controller::DRIVE_BUFFER_SIZE;
-const int Controller::NUM_SKIP_FRAMES = 10;
+const int Controller::NUM_SKIP_FRAMES = 100;
 
 void Controller::update(float drive)
 {
@@ -19,14 +19,14 @@ const float LEVEL_OF_APPROXIMATION = 0.7f; // should be between 0.f and 1.f
 
 float Controller::meters_per_second_approx() const
 {
-	if (drive_buffer.size == 0) {
+	if (drive_buffer.size() == 0) {
 		return meters_per_second();
 	}
 
 	// calculate a value representing the last drives
 	float drive_representation = drive_buffer[0];
-	for (unsigned int i = 0; i < drive_buffer.size(); i++) {
-		drive_representation = (drive_representation + drive_buffer[i]) / 2.f;
+	for (std::deque<int>::const_iterator iter = drive_buffer.begin(); iter != drive_buffer.end(); ++iter) {
+		drive_representation = (drive_representation + *iter) / 2.f;
 	}
 
 	const float approx_speed = drive_to_speed(drive_representation);
@@ -47,7 +47,7 @@ float Controller::calculate_steer(float value_steer, Side side)
 	}
 }
 
-const float ACCELERATION = 0.00035f;
+const float ACCELERATION = 0.00045f;
 const float MAX_NULL_DRIVE = 0.55f; // The maximal value for which the car would stop after a time
 
 float Controller::speed_to_drive(float target)
@@ -74,6 +74,10 @@ float Controller::drive_to_speed(float drive)
 void Controller::update_drive_values(float drive) {
 	skip_frames_counter = (skip_frames_counter + 1) % NUM_SKIP_FRAMES;
 	if (skip_frames_counter == 0) {
-		drive_buffer << drive;
+		drive_buffer.push_front(drive);
+		// limit to DRIVE_BUFFER_SIZE drive values
+		if (drive_buffer.size() > DRIVE_BUFFER_SIZE) {
+			drive_buffer.pop_back();
+		}
 	}
 }

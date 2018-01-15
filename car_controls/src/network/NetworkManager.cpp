@@ -44,14 +44,20 @@ void rx_interrupt() {
 
 // public stuff ############
 
-void NetworkManager::init()
+void NetworkManager::init(const CarState& original)
 {
+	car_state_tmp.update_from(original);
 	NetworkManager::pi.attach(&rx_interrupt);
 }
 
 void NetworkManager::send(float f)
 {
-	NetworkManager::pi.printf("%f", f);
+	uint8_t* p = (uint8_t*)&f;
+	for (unsigned int i = 0; i < sizeof(float); i++) {
+		NetworkManager::pi.putc(*p);
+		p++;
+	}
+	//NetworkManager::pi.printf("%f", f);
 }
 
 void NetworkManager::send(int i)

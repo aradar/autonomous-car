@@ -207,7 +207,7 @@ flags = [
 # which is required for compiling the standard library, and to 'c++11' for older
 # versions.
 if platform.system() != 'Windows':
-  flags.append( '-std=c++17' )
+  flags.append( '-std=c++98' )
 
 
 # Set this to the absolute path to the folder (NOT the file!) containing the

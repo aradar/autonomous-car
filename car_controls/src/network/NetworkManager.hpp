@@ -11,7 +11,7 @@ class NetworkManager
 	public:
 		NetworkManager();
 
-		void init();
+		void init(const CarState& original);
 
 		void send(float f);
 		void send(int i);
