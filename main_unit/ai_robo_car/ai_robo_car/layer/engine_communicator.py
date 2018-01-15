@@ -7,7 +7,15 @@ import math
 
 
 class EngineCommunicator(AbstractLayer[EngineInstruction, None]):
+    """
+    The EngineCommunicator handles the serial communication between main unit and car controls (car engine).
+    """
     def __init__(self, upper: AbstractLayer, lower: AbstractLayer, is_test_communication=False):
+        """
+        :param upper: the upper layer, most of the time the PathTranslator
+        :param lower: should be None by default
+        :param is_test_communication: set only be true when the function is called by a test
+        """
         super(EngineCommunicator, self).__init__(upper, lower)
         self.is_test_communication = is_test_communication
         if self.is_test_communication:
@@ -18,6 +26,11 @@ class EngineCommunicator(AbstractLayer[EngineInstruction, None]):
             self.ser.baudrate = 9600
 
     def call_from_upper(self, engine_instruction: EngineInstruction) -> None:
+        """
+        called by the upper layer, most of the time PathTranslator
+        :param engine_instruction: gets a single EngineInstruction that gets packed and send over serial
+        :return: None
+        """
         if self.ser is not None:
             if engine_instruction is None:
                 # Todo: send break
@@ -40,4 +53,7 @@ class EngineCommunicator(AbstractLayer[EngineInstruction, None]):
             self.upper.call_upper(message + str("!"))
 
     def close(self):
+        """
+        Closes the serial port
+        """
         self.ser.close()

@@ -3,6 +3,11 @@ from typing import Tuple
 
 
 class ObjectType(Enum):
+    """
+    0 - defines a undefined object
+    1 - a blue cup
+    2 - a yellow cup
+    """
     UNDEFINED_OBJECT = 0
     BLUE_CUP = 1
     YELLOW_CUP = 2
@@ -10,6 +15,16 @@ class ObjectType(Enum):
 
 class BoundingBox:
     def __init__(self, left, right, top, bottom, width, height, object_type):
+        """
+        A BoundingBox defines the size, location in pixels and the ObjectType of an object.
+        :param left: the left side of the object, relative of the whole image
+        :param right: the right side of the object, relative of the whole image
+        :param top: the top side of the object, relative of the whole image
+        :param bottom: the bottom side of the object, relative of the whole image
+        :param width: the width of the object
+        :param height: the height of the object
+        :param object_type: the object type
+        """
         self.left = left
         self.right = right
         self.top = top
@@ -41,11 +56,17 @@ class DetectedObject:
 
 
 class TargetPoint:
+    """
+    Represents the position the car should drive on the current state.
+    """
     def __init__(self, position):
         self.position = position
 
 
 class EngineInstruction:
+    """
+    Represents the speed and steer the car should drive on the current state.
+    """
     def __init__(self, speed, steer):
         self.speed = speed
         self.steer = steer
