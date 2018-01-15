@@ -29,13 +29,13 @@ class BoundingBox:
         self.right = right
         self.top = top
         self.bottom = bottom
-        self.height = height
         self.width = width
+        self.height = height
         self.object_type = object_type
 
     def __str__(self):
-        return "BoundingBox: left {}, right {}, top {}, bottom {}, height {}, width {}, object_type {}".format(
-            self.left, self.right, self.top, self.bottom, self.height, self.width, self.object_type)
+        return "BoundingBox: left {}, right {}, top {}, bottom {}, width {}, height {}, object_type {}".format(
+            self.left, self.right, self.top, self.bottom, self.width, self.height, self.object_type)
 
 
 class DetectedObject:
