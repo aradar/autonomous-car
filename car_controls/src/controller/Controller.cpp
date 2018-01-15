@@ -35,16 +35,18 @@ float Controller::meters_per_second_approx() const
 		(1.f - LEVEL_OF_APPROXIMATION) * measured_speed; // measured
 }
 
-float Controller::calculate_steer(float value_steer, Side side)
-{
-	if (value_steer > 0.4){
-		value_steer=0.4;
-	}
+float Controller::calculate_steer(float steer_Degree, Side side){
+	float steer_value;
 	if (side == LEFT){
-		return 0.4 - (value_steer/10);
-	} else {
-		return 0.4 + (value_steer/10);
+		steer_value = 0.5 + steer_Degree * 0.0075 ;
+	}else{
+		steer_value = 0.5 - steer_Degree * 0.0075;
 	}
+	if (steer_value > 0.8)
+		steer_value = 0.8;
+	if (steer_value < 0.2)
+		steer_value = 0.2;
+	return steer_value;
 }
 
 const float ACCELERATION = 0.00045f;

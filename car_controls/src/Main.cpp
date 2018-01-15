@@ -4,6 +4,13 @@
 
 #include <misc/sequences.hpp>
 #include <debug/LEDHandler.hpp>
+#include <network/NetworkManager.hpp>
+
+int main() {
+	Main main;
+	main.run();
+	return 0;
+}
 
 Main::Main()
 	: drive(PA_12), steer(PB_0)
@@ -25,10 +32,10 @@ void Main::run()
 	int blink_counter = 0;
 	const int blink_period = 50;
 
-	state.target_speed = 0.5f;
+	state.target_speed = 0.f;
 	state.steer_changed = true;
 
-	network_manager.init(state);
+	NetworkManager::init(state);
 
     while(1) {
 		controller.update(drive);
@@ -36,7 +43,7 @@ void Main::run()
 		// update current speed
 		state.current_speed = controller.meters_per_second_approx();
 
-		network_manager.update_car_state(&state);
+		NetworkManager::update_car_state(&state);
 
 		// update steer
         if (state.steer_changed) {
@@ -53,9 +60,9 @@ void Main::run()
 		blink_counter = (blink_counter + 1) % blink_period;
 		if (blink_counter == 0) {
 			LEDHandler::toggle();
-			network_manager.send(state.current_speed);
-			network_manager.send(state.target_speed);
-			network_manager.send(drive);
+			//NetworkManager::send(state.current_speed);
+			//NetworkManager::send(state.target_speed);
+			//NetworkManager::send(drive);
 		}
 
 		wait(0.01f);

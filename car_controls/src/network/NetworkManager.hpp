@@ -11,13 +11,13 @@ class NetworkManager
 	public:
 		NetworkManager();
 
-		void init(const CarState& original);
+		static void init(const CarState& original);
 
-		void send(float f);
-		void send(int i);
-		void send(const std::string& s);
+		static void send(float f);
+		static void send(int i);
+		static void send(const std::string& s);
 
-		void update_car_state(CarState* car_state);
+		static void update_car_state(CarState* car_state);
 
 		static Serial pi;
 };

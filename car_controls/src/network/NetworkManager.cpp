@@ -20,6 +20,8 @@ void serialReadCallback() {
 	car_state_tmp.target_speed = input.value_speed;
 	car_state_tmp.steer = input.value_steer;
 	car_state_tmp.steer_changed = true;
+
+	NetworkManager::send(car_state_tmp.target_speed);
 }
 
 int rx_buffer_size = 0;

@@ -6,7 +6,6 @@
 
 #include <controller/Controller.hpp>
 #include <misc/CarState.hpp>
-#include <network/NetworkManager.hpp>
 
 class Main
 {
@@ -16,7 +15,6 @@ class Main
 	private:
 		Controller controller;
 		CarState state;
-		NetworkManager network_manager;
 
 		Servo drive;
 		Servo steer;
