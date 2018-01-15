@@ -65,6 +65,8 @@ class PathTranslator(AbstractLayer[TargetPoint, EngineInstruction]):
                     steer = -90 - angle
                 speed = 1 - (math.fabs(steer) / threshold_angle)
                 speed = 0.5 + 0.5 * speed
+
+            speed = max(0, min(1, speed)) # savety first
             engine_instruction = EngineInstruction(speed, steer)
 
         logger.debug("produced {}".format(pformat(engine_instruction)))
