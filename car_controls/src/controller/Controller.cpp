@@ -8,6 +8,8 @@ const int Controller::NUM_SKIP_FRAMES = 100;
 const float Controller::MAX_STEER_VALUE = 0.7f;
 const float Controller::MIN_STEER_VALUE = 1-Controller::MAX_STEER_VALUE;
 
+const float Controller::MAX_SPEED_LIMIT = 2.f;
+
 void Controller::update(float drive)
 {
 	update_drive_values(drive);
@@ -64,6 +66,9 @@ float Controller::speed_to_drive(float target)
 
 float Controller::calculate_drive(float current_speed, float target_speed)
 {
+	if (target_speed > MAX_SPEED_LIMIT) {
+		target_speed = MAX_SPEED_LIMIT;
+	}
 	float acceleration = 0.05;
 	return acceleration * (target_speed - current_speed) + speed_to_drive(target_speed);
 }

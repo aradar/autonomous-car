@@ -26,6 +26,7 @@ class Controller
 
 		static const float MAX_STEER_VALUE;
 		static const float MIN_STEER_VALUE;
+		static const float MAX_SPEED_LIMIT;
 
 		void update(float drive);
 

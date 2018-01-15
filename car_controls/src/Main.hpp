@@ -6,6 +6,7 @@
 
 #include <controller/Controller.hpp>
 #include <misc/CarState.hpp>
+#include <misc/EmergencyBreak.hpp>
 
 class Main
 {
@@ -16,6 +17,7 @@ class Main
 	private:
 		Controller controller;
 		CarState state;
+		EmergencyBreak emergency_break;
 
 		Servo drive;
 		Servo steer;
