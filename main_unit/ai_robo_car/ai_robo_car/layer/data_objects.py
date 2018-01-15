@@ -54,6 +54,10 @@ class DetectedObject:
         self.radius = radius
         self.object_type = object_type
 
+    def __str__(self):
+        return "DetectedObject: position {}, radius {}, objects_type {}".format(
+            self.position, self.radius, self.object_type)
+
 
 class TargetPoint:
     """
@@ -61,6 +65,9 @@ class TargetPoint:
     """
     def __init__(self, position):
         self.position = position
+
+    def __str__(self):
+        return "TargetPoint: position {}".format(self.position)
 
 
 class EngineInstruction:
@@ -70,3 +77,6 @@ class EngineInstruction:
     def __init__(self, speed, steer):
         self.speed = speed
         self.steer = steer
+
+    def __str__(self):
+        return "EngineInstruction: speed {}, steer {}".format(self.speed, self.steer)
