@@ -1,0 +1,101 @@
+#!/usr/bin/env python3
+"""
+This is a test
+
+Usage:
+  main start [<ipc_secret>] [--address=<ipc_address>] [--port=<ipc_port>] [--frequency=<heart_frequency>] [--fork]
+  main pause [<ipc_secret>] [--address=<ipc_address>] [--port=<ipc_port>]
+  main resume [<ipc_secret>] [--address=<ipc_address>] [--port=<ipc_port>]
+  main stop [<ipc_secret>] [--address=<ipc_address>] [--port=<ipc_port>]
+  main (-h | --help)
+
+Options:
+  -h --help                       Show this screen.
+  --address=<ipc_address>         Address to which the ipc connects [default: localhost].
+  --port=<ipc_port>               Port to which the ipc connects [default: 6789].
+  --frequency=<heart_frequency>   Frequency at which the logic loop runs [default: 30].
+  --fork                          Forks the process shortly before really starting the services [default: False].
+
+"""
+from multiprocessing.connection import Client
+from typing import Union
+from docopt import docopt
+
+from ai_robo_car.layer import ObjectRecognizer, RelativeTranslator, PathFinder, PathTranslator, EngineCommunicator
+from ai_robo_car.layer.test_layer import PrintTestLayer
+from ai_robo_car.layer_management import RemoteControlCommand, RemoteControlMessage, build_and_start_env
+
+
+def build_layers():
+    layer1 = ObjectRecognizer(None, None)
+    layer2 = RelativeTranslator(None, None)
+    layer3 = PathFinder(None, None)
+    layer4 = PathTranslator(None, None)
+    layer5 = EngineCommunicator(None, None)
+
+    layer1.lower = layer2
+    layer2.lower = layer3
+    layer3.lower = layer4
+    layer4.lower = layer5
+    layer2.upper = layer1
+    layer3.upper = layer2
+    layer4.upper = layer3
+    layer5.upper = layer4
+
+    return layer1
+
+
+def encode_ipc_secret(ipc_secret: str) -> Union[bytes, None]:
+    encoded_ipc_secret = None
+    if ipc_secret is not None:
+        encoded_ipc_secret = ipc_secret.encode()
+
+    return encoded_ipc_secret
+
+
+def start_server(ipc_secret: str, heart_frequency: float = 30,
+                 ipc_address: str = "localhost", ipc_port: int = 6789):
+    # highest_layer = build_layers() # should be put back before real usage
+    highest_layer = PrintTestLayer()
+    build_and_start_env(
+        highest_layer=highest_layer,
+        frequency=heart_frequency,
+        ipc_secret=encode_ipc_secret(ipc_secret),
+        ipc_address=(ipc_address, ipc_port))
+
+
+def communicate_with_server(ipc_secret: str, ipc_address: str, ipc_port: int, command: RemoteControlCommand):
+    with Client((ipc_address, ipc_port), authkey=encode_ipc_secret(ipc_secret)) as conn:
+        conn.send(RemoteControlMessage(command))
+        conn.close()
+
+
+if __name__ == "__main__":
+    arguments = docopt(__doc__)
+    if arguments["start"]:
+        start_server(
+            ipc_secret=arguments["<ipc_secret>"],
+            heart_frequency=float(arguments["--frequency"]),
+            ipc_address=arguments["--address"],
+            ipc_port=int(arguments["--port"]))
+    elif arguments["pause"]:
+        communicate_with_server(
+            ipc_secret=arguments["<ipc_secret>"],
+            ipc_address=arguments["--address"],
+            ipc_port=int(arguments["--port"]),
+            command=RemoteControlCommand.PAUSE
+        )
+    elif arguments["resume"]:
+        communicate_with_server(
+            ipc_secret=arguments["<ipc_secret>"],
+            ipc_address=arguments["--address"],
+            ipc_port=int(arguments["--port"]),
+            command=RemoteControlCommand.RESUME
+        )
+    elif arguments["stop"]:
+        communicate_with_server(
+            ipc_secret=arguments["<ipc_secret>"],
+            ipc_address=arguments["--address"],
+            ipc_port=int(arguments["--port"]),
+            command=RemoteControlCommand.SHUTDOWN
+        )
