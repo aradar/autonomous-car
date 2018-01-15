@@ -1,17 +1,20 @@
+from pprint import pformat
 from typing import List, Tuple
 import math
-
+import logging
 from ai_robo_car.abstract_layer import AbstractLayer
 from ai_robo_car.layer.data_objects import DetectedObject, TargetPoint, ObjectType
+
+logger = logging.getLogger(__name__)
 
 
 class PathFinder(AbstractLayer[List[DetectedObject], TargetPoint]):
     def call_from_upper(self, detected_objects: List[DetectedObject]) -> None:
-        if self.lower is not None:
-            if detected_objects is None:
-                self.call_lower(None)
-                return
+        if self.lower is None:
+            return
 
+        target_point = None
+        if detected_objects is not None:
             blue_cups = PathFinder.get_objects_by_type(detected_objects, ObjectType.BLUE_CUP)
             yellow_cups = PathFinder.get_objects_by_type(detected_objects, ObjectType.YELLOW_CUP)
 
@@ -22,9 +25,9 @@ class PathFinder(AbstractLayer[List[DetectedObject], TargetPoint]):
                 target_point = TargetPoint(
                     PathFinder.calculate_center_point(nearest_yellow_cup.position, nearest_blue_cup.position))
 
-                self.call_lower(target_point)
-            else:
-                self.call_lower(None)
+        logger.debug("produced {}".format(pformat(target_point)))
+        self.call_lower(target_point)
+
 
     @staticmethod
     def calculate_center_point(position1: Tuple[float], position2: Tuple[float]) -> Tuple[float]:

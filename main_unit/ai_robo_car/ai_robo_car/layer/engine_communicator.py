@@ -1,9 +1,14 @@
-from ai_robo_car.abstract_layer import AbstractLayer
-from ai_robo_car.layer.data_objects import EngineInstruction
-from ai_robo_car.packet import Packetizer, Side, Direction
+import logging
+from pprint import pformat
+
 import serial
 import socket
 import math
+from ai_robo_car.abstract_layer import AbstractLayer
+from ai_robo_car.layer.data_objects import EngineInstruction
+from ai_robo_car.packet import Packetizer, Side, Direction
+
+logger = logging.getLogger(__name__)
 
 
 class EngineCommunicator(AbstractLayer[EngineInstruction, None]):
@@ -29,6 +34,7 @@ class EngineCommunicator(AbstractLayer[EngineInstruction, None]):
             speed = math.fabs(engine_instruction.speed)
 
             data = Packetizer.create_data(side, direction, 0, steer, speed)
+            logger.debug("produced {}".format(pformat(data)))
             if self.is_test_communication:
                 self.ser.send(data)
             else:

@@ -1,8 +1,11 @@
+import logging
 from math import tan, isclose, radians
+from pprint import pformat
 from typing import List, Tuple
-
 from ai_robo_car.abstract_layer import AbstractLayer
 from ai_robo_car.layer.data_objects import BoundingBox, DetectedObject
+
+logger = logging.getLogger(__name__)
 
 
 class RelativeTranslator(AbstractLayer[List[BoundingBox], List[DetectedObject]]):
@@ -39,11 +42,11 @@ class RelativeTranslator(AbstractLayer[List[BoundingBox], List[DetectedObject]])
         self.original_image_aspect_ratio = original_image_aspect_ratio
 
     def call_from_upper(self, bounding_boxes: List[BoundingBox]) -> None:
-        if self.lower is not None:
-            if bounding_boxes is None:
-                self.call_lower(None)
-                return
+        if self.lower is None:
+            return
 
+        detected_objects = None
+        if bounding_boxes is not None:
             detected_objects = []
             for bounding_box in bounding_boxes:
                 if self.proportions_fit(bounding_box.width, bounding_box.height):
@@ -55,7 +58,8 @@ class RelativeTranslator(AbstractLayer[List[BoundingBox], List[DetectedObject]])
             if len(detected_objects) == 0:
                 detected_objects = None
 
-            self.call_lower(detected_objects)
+        logger.debug("produced {}".format(pformat(detected_objects)))
+        self.call_lower(detected_objects)
 
     def call_from_lower(self, message: str) -> None:
         raise NotImplementedError

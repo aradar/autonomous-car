@@ -1,7 +1,12 @@
+import logging
+from pprint import pprint, pformat
+
 from pixy import *
 from ctypes import *
 from ai_robo_car.layer.data_objects import BoundingBox, ObjectType
 from ai_robo_car.abstract_layer import AbstractLayer
+
+logger = logging.getLogger(__name__)
 
 
 class Blocks(Structure):
@@ -65,9 +70,10 @@ def is_bounding_box_valid(bounding_box: BoundingBox) -> bool:
 class ObjectRecognizer(AbstractLayer[str, str]):
     def __init__(self, upper: AbstractLayer, lower: AbstractLayer):
         super().__init__(upper, lower)
+        logger.info("initializing pixy cam")
         init_value = pixy_init()
         if init_value is not 0:
-            print("pixy cam could not be initialized error:", init_value)  # todo remove
+            logger.error(str.format("pixy cam could not be initialized error: {}", init_value))
 
     def call_from_upper(self, message: str) -> None:
         bounding_boxes = []
@@ -77,6 +83,8 @@ class ObjectRecognizer(AbstractLayer[str, str]):
                 bounding_box = create_bounding_box(blocks[i])
                 if is_bounding_box_valid(bounding_box):
                     bounding_boxes.append(bounding_box)
+
+        logger.debug("produced {}".format(pformat(bounding_boxes)))
 
         if len(bounding_boxes) is 0:
             self.call_lower(None)

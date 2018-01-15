@@ -1,15 +1,21 @@
+import logging
+import math
+from pprint import pformat
+
 from ai_robo_car.abstract_layer import AbstractLayer
 from ai_robo_car.layer.data_objects import TargetPoint
 from ai_robo_car.layer.data_objects import EngineInstruction
-import math
+
+logger = logging.getLogger(__name__)
 
 
 class PathTranslator(AbstractLayer[TargetPoint, EngineInstruction]):
     def call_from_upper(self, target_point: TargetPoint) -> None:
-        if self.lower is not None:
-            if target_point is None:
-                self.call_lower(None)
-                return
+        if self.lower is None:
+            return
+
+        engine_instruction = None
+        if target_point is not None:
 
             (x, y) = target_point.position
 
@@ -35,7 +41,7 @@ class PathTranslator(AbstractLayer[TargetPoint, EngineInstruction]):
 
                 # threshold
                 if angle < 0 or angle > 180:
-                    print("INVALID ANGLE:", angle)
+                    logger.error("angle ({}) is invalid!".format(angle))
                     angle = 90
                 elif 0 <= angle < 90 - threshold_angle:
                     angle = threshold_angle
@@ -48,8 +54,10 @@ class PathTranslator(AbstractLayer[TargetPoint, EngineInstruction]):
                     steer = -90 - angle
                 speed = 1 - (math.fabs(steer) / threshold_angle)
                 speed = 0.5 + 0.5 * speed
+                engine_instruction = EngineInstruction(speed, steer)
 
-            self.call_lower(EngineInstruction(speed, steer))
+        logger.debug("produced {}".format(pformat(engine_instruction)))
+        self.call_lower(engine_instruction)
 
     def call_from_lower(self, message: EngineInstruction) -> None:
         print("PathTranslator: call_from_lower -> " + message)

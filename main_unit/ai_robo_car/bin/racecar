@@ -19,6 +19,8 @@ Options:
 """
 from multiprocessing.connection import Client
 from typing import Union
+
+import logging
 from docopt import docopt
 
 from ai_robo_car.layer import ObjectRecognizer, RelativeTranslator, PathFinder, PathTranslator, EngineCommunicator
@@ -33,10 +35,10 @@ def build_layers():
                                              camera_x_view_angle=150, camera_y_view_angle=94)
     path_finder = PathFinder(None, None)
     path_translator = PathTranslator(None, None)
-    #engine_communicator_server = EngineCommunicatorServer(-1)
-    #engine_communicator_server.start()
-    #engine_communicator = EngineCommunicator(None, None, True)
-    engine_communicator = EngineCommunicator(None, None, False)
+    engine_communicator_server = EngineCommunicatorServer(-1)
+    engine_communicator_server.start()
+    engine_communicator = EngineCommunicator(None, None, True)
+    #engine_communicator = EngineCommunicator(None, None, False)
 
     object_recognizer.lower = relative_translator
     relative_translator.lower = path_finder
@@ -58,8 +60,22 @@ def encode_ipc_secret(ipc_secret: str) -> Union[bytes, None]:
     return encoded_ipc_secret
 
 
+def setup_logger():
+    root_logger = logging.getLogger()
+
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+    stream_handler = logging.StreamHandler()
+    stream_handler.setLevel(logging.DEBUG)
+    stream_handler.setFormatter(formatter)
+
+    root_logger.setLevel(logging.DEBUG)
+    root_logger.addHandler(stream_handler)
+
+
 def start_server(ipc_secret: str, heart_frequency: float = 30,
                  ipc_address: str = "localhost", ipc_port: int = 6789):
+    setup_logger()
     highest_layer = build_layers()
     build_and_start_env(
         highest_layer=highest_layer,

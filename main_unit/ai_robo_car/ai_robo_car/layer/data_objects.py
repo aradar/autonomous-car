@@ -22,6 +22,9 @@ class BoundingBox:
         return "BoundingBox: left {}, right {}, top {}, bottom {}, height {}, width {}, object_type {}".format(
             self.left, self.right, self.top, self.bottom, self.height, self.width, self.object_type)
 
+    def __repr__(self) -> str:
+        return self.__str__()
+
 
 class DetectedObject:
     """
@@ -39,13 +42,22 @@ class DetectedObject:
         self.radius = radius
         self.object_type = object_type
 
+    def __repr__(self) -> str:
+        return self.__str__()
+
 
 class TargetPoint:
     def __init__(self, position):
         self.position = position
+
+    def __repr__(self) -> str:
+        return self.__str__()
 
 
 class EngineInstruction:
     def __init__(self, speed, steer):
         self.speed = speed
         self.steer = steer
+
+    def __repr__(self) -> str:
+        return self.__str__()
