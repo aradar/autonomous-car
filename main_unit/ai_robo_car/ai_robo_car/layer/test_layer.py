@@ -23,3 +23,13 @@ class PrintTestLayer(AbstractLayer[str, str]):
 
     def call_from_lower(self, message: str) -> None:
         print(message)
+
+    def stop(self) -> None:
+        print("stopped")
+
+    def pause(self) -> None:
+        print("paused")
+
+    def resume(self) -> None:
+        print("resumed")
+

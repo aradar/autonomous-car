@@ -60,3 +60,23 @@ class AbstractLayer(Generic[U, L]):
         """
 
         self.upper.call_from_lower(message)
+
+    def stop(self) -> None:
+        """
+        Gets called if the complete layer structure is about to shutdown. Methods which have resources should do there
+        clean up in this function.
+        """
+        pass
+
+    def pause(self) -> None:
+        """
+        Gets called if the layer structure pauses. This is primarily for the EngineCommunicator to stop it from driving
+        against a wall.
+        """
+        pass
+
+    def resume(self) -> None:
+        """
+        Gets called if the layer structure resumes its work after being paused.
+        """
+        pass

@@ -2,7 +2,7 @@ import time
 from enum import Enum
 from multiprocessing.connection import Listener, Pipe
 from threading import Thread, Event
-from typing import Tuple, List, Union, Any
+from typing import Tuple, List, Union, Any, Callable
 
 from multiprocessing import AuthenticationError
 
@@ -53,28 +53,49 @@ class ControllableThread(Thread):
             command: RemoteControlCommand = self.command_pipe.recv()
         return command
 
-    def run(self):
+    def run(self) -> None:
         paused: bool = False
         while True:
             command = self.read_new_command(use_timeout=paused)
 
             if command == RemoteControlCommand.SHUTDOWN:
+                self.stop()
                 return  # terminate the thread
             elif command == RemoteControlCommand.PAUSE:
+                self.pause()
                 paused = True
             elif command == RemoteControlCommand.RESUME:
+                self.resume()
                 paused = False
 
             if not paused:
                 self.loop()
 
-    def loop(self):
+    def loop(self) -> None:
         """
         Is called like the body of a while loop from the thread itself and can be paused or stopped from it.
 
         This has to be implemented from subclasses otherwise a NotImplementedError gets raised!.
         """
         raise NotImplementedError("This function has to be implemented by subclasses!")
+
+    def stop(self) -> None:
+        """
+        Gets called if the thread stops.
+        """
+        pass
+
+    def pause(self) -> None:
+        """
+        Gets called if the thread pauses.
+        """
+        pass
+
+    def resume(self) -> None:
+        """
+        Gets called if the thread resumes.
+        """
+        pass
 
 
 class PipeManager:
@@ -119,10 +140,29 @@ class LayerManager(ControllableThread):
         self.highest_layer = highest_layer
         self.heart_beat = heart_beat
 
-    def loop(self):
+    def loop(self) -> None:
         self.heart_beat.wait()
         self.highest_layer.call_from_upper("hallo")  # needs to be changed
         self.heart_beat.clear()
+
+    def stop(self) -> None:
+        self.call_func_on_stack("stop")
+
+    def pause(self) -> None:
+        self.call_func_on_stack("pause")
+
+    def resume(self) -> None:
+        self.call_func_on_stack("resume")
+
+    def call_func_on_stack(self, method_name: str) -> None:
+        """
+        Calls the function with the name method_name on all entities in the layer stack.
+        :param method_name: Name of the function which gets called
+        """
+        layer = self.highest_layer
+        while layer is not None:
+            getattr(layer, method_name)()
+            layer = layer.lower
 
 
 class RemoteControl(Thread):
@@ -140,7 +180,7 @@ class RemoteControl(Thread):
         self.pipe_manager = pipe_manager
         self.address = address
 
-    def run(self):
+    def run(self) -> None:
         try:
             with Listener(address=self.address, authkey=self.authkey) as listener:
                 while True:
@@ -172,7 +212,7 @@ class Heart(ControllableThread):
         self.wait_time = wait_time
         self.beat = heart_beat
 
-    def loop(self):
+    def loop(self) -> None:
         time.sleep(self.wait_time)
         self.beat.set()
 
