@@ -16,6 +16,46 @@ Main::Main()
 	: drive(PA_12), steer(PB_0)
 {}
 
+bool Main::emergencyStop(){
+	Timer sonar;			
+	int distance = 0;
+	
+	DigitalIn echo_one(PA_8);		// sensor 1
+	DigitalOut trig_one(PF_1);		// sensor 1
+	DigitalIn echo_two(PF_0);		// sensor 2
+	DigitalOut trig_two(PB_5);		// sensor 2
+		
+	trig_one = 1;					// send trigger signal for sensor 1
+	sonar.reset();
+	wait_us(10.0);
+    trig_one = 0;					
+    while (echo_one==0) {};			// wait for echo signal
+    sonar.start();
+    while (echo_one==1) {};	
+    sonar.stop();					// stops time echo needed	
+    distance = (sonar.read_us())/58.0;	// distance between 
+	printf("First: %d cm \n\r", distance);
+	if(distance < 40)
+		return true;
+	
+	wait_us(10.0);
+	
+	trig_two = 1;					//send trigger signal for sensor 2
+	sonar.reset();
+    wait_us(10.0);
+    trig_two = 0;
+    while (echo_two==0) {};
+    sonar.start();
+    while (echo_two==1) {};
+    sonar.stop();
+    distance = (sonar.read_us())/58.0;
+	printf("Second: %d cm \n\r", distance);
+	if(distance < 40)
+		return true;
+	
+	return false;
+}
+
 void Main::run()
 {
 	// calibrate
@@ -24,6 +64,7 @@ void Main::run()
 	// test
 
 	wait(1);
+
 	/*
 	sequences::test_steer(steer);
 	sequences::test_drive(drive);
@@ -37,7 +78,7 @@ void Main::run()
 
 	NetworkManager::init(state);
 
-    while(1) {
+    while(!emergencyStop()) {
 		controller.update(drive);
 
 		// update current speed
@@ -68,4 +109,5 @@ void Main::run()
 
 		wait(0.01f);
     }
+    drive = 0;
 }

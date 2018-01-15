@@ -12,6 +12,7 @@ class Main
 	public:
 		Main();
 		void run();
+		bool emergencyStop();
 	private:
 		Controller controller;
 		CarState state;
