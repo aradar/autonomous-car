@@ -6,8 +6,8 @@
 #include <debug/LEDHandler.hpp>
 #include <network/NetworkManager.hpp>
 
-const int Main::NORMAL_BLINK_PERIOD = 7;
-const int Main::IGNORING_BLINK_PERIOD = 2;
+const int Main::NORMAL_BLINK_PERIOD = 12;
+const int Main::IGNORING_BLINK_PERIOD = 1;
 
 int main() {
 	Main main;
@@ -16,7 +16,7 @@ int main() {
 }
 
 Main::Main()
-	: mode(NORMAL), drive(PA_12), steer(PB_0), blink_counter(0), blink_period(7)
+	: mode(NORMAL), drive(PA_12), steer(PB_0), blink_counter(0), blink_period(NORMAL_BLINK_PERIOD)
 {}
 
 void Main::handle_blink() {
@@ -48,13 +48,12 @@ void Main::run()
 	sequences::test_drive(drive);
 	*/
 
-
 	state.target_speed = 0.f;
 	state.steer_changed = true;
 
 	NetworkManager::init(state);
 
-    while(1) {
+	while(1) {
 		if (emergency_break.emergency_stop()) {
 			mode = IGNORING;
 
@@ -68,7 +67,6 @@ void Main::run()
 
 		if (mode == NORMAL) {
 			controller.update(drive);
-
 
 			NetworkManager::update_car_state(&state);
 
@@ -92,7 +90,7 @@ void Main::run()
 		}
 		handle_blink();
 		wait(0.04f);
-    }
+	}
 
 	drive = 0;
 

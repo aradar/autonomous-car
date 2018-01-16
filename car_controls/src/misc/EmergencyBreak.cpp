@@ -18,13 +18,13 @@ bool EmergencyBreak::emergency_stop() {
 	trig_one = 1; // send trigger signal for sensor 1
 	sonar.reset();
 	wait_us(10.0);
-    trig_one = 0;
-    while (echo_one==0) {}; // wait for echo signal
-    sonar.start();
-    while (echo_one==1) {};
+	trig_one = 0;
+	while (echo_one==0) {} // wait for echo signal
+	sonar.start();
+	while (echo_one==1) {}
 
-    sonar.stop(); // stops time echo needed
-    distance = (sonar.read_us())/58.0; // distance between
+	sonar.stop(); // stops time echo needed
+	distance = (sonar.read_us())/58.0; // distance between
 	printf("First: %d cm \n\r", distance);
 	if(distance < THRESHOLD)
 		return true;
@@ -33,13 +33,13 @@ bool EmergencyBreak::emergency_stop() {
 
 	trig_two = 1; //send trigger signal for sensor 2
 	sonar.reset();
-    wait_us(10.0);
-    trig_two = 0;
-    while (echo_two==0) {};
-    sonar.start();
-    while (echo_two==1) {};
-    sonar.stop();
-    distance = (sonar.read_us())/58.0;
+	wait_us(10.0);
+	trig_two = 0;
+	while (echo_two==0) {}
+	sonar.start();
+	while (echo_two==1) {}
+	sonar.stop();
+	distance = (sonar.read_us())/58.0;
 	//printf("Second: %d cm \n\r", distance);
 	if(distance < THRESHOLD)
 		return true;
