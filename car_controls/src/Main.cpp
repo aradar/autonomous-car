@@ -36,7 +36,7 @@ void Main::handle_blink() {
 
 void Main::run()
 {
-	emergency_break.enable();
+	emergency_break.disable();
 
 	// calibrate
 	sequences::calibrate();
