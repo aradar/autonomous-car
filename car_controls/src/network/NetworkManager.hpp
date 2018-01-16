@@ -23,6 +23,8 @@ class NetworkManager
 
 		static float test_value1;
 		static float test_value2;
+
+		static bool restart_bit_received;
 };
 
 #endif

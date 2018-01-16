@@ -10,9 +10,11 @@ SerialInputProtocol SerialInputProtocol::read(uint8_t* buffer) {
 	result.side = (options & SIDE_MASK) == SIDE_MASK ? RIGHT : LEFT;
 	result.direction = (options & DIRECTION_MASK) == DIRECTION_MASK ? FORWARD : BACKWARD ;
 	result.debugLevel = DEBUG_MASK & options;
+	result.restart_bit = (options & RESTART_MASK) == RESTART_MASK;
 
 	result.value_steer = *(reinterpret_cast<float*> (buffer+1));
 	result.value_speed = *(reinterpret_cast<float*> (buffer+5));
+
 
 	return result;
 }

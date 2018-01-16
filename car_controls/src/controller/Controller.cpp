@@ -54,8 +54,8 @@ float Controller::calculate_steer(float steer_Degree, Side side){
 	return steer_value;
 }
 
-const float ACCELERATION = 0.00045f;
-const float MAX_NULL_DRIVE = 0.55f; // The maximal value for which the car would stop after a time
+const float ACCELERATION = 0.00055f;
+const float MAX_NULL_DRIVE = 0.57f; // The maximal value for which the car would stop after a time
 
 float Controller::speed_to_drive(float target)
 {

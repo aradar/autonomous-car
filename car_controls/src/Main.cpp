@@ -6,6 +6,9 @@
 #include <debug/LEDHandler.hpp>
 #include <network/NetworkManager.hpp>
 
+const int Main::NORMAL_BLINK_PERIOD = 7;
+const int Main::IGNORING_BLINK_PERIOD = 2;
+
 int main() {
 	Main main;
 	main.run();
@@ -13,13 +16,27 @@ int main() {
 }
 
 Main::Main()
-	: drive(PA_12), steer(PB_0)
+	: mode(NORMAL), drive(PA_12), steer(PB_0), blink_counter(0), blink_period(7)
 {}
+
+void Main::handle_blink() {
+	LEDHandler::update();
+
+	// blink
+	blink_counter = (blink_counter + 1) % blink_period;
+	if (blink_counter == 0) {
+		LEDHandler::toggle();
+		NetworkManager::send(state.current_speed);
+		//NetworkManager::send(state.target_speed);
+		//NetworkManager::send(state.steer);
+		//NetworkManager::send((float)state.side);
+	}
+}
 
 
 void Main::run()
 {
-	emergency_break.disable();
+	emergency_break.enable();
 
 	// calibrate
 	sequences::calibrate();
@@ -31,47 +48,53 @@ void Main::run()
 	sequences::test_drive(drive);
 	*/
 
-	int blink_counter = 0;
-	const int blink_period = 7;
 
 	state.target_speed = 0.f;
 	state.steer_changed = true;
 
 	NetworkManager::init(state);
 
-    while(!emergency_break.emergency_stop()) {
-		controller.update(drive);
+    while(1) {
+		if (emergency_break.emergency_stop()) {
+			mode = IGNORING;
+
+			state.target_speed = 0.f;
+			steer = 0.5f;
+			blink_period = IGNORING_BLINK_PERIOD;
+		}
 
 		// update current speed
 		state.current_speed = controller.meters_per_second_approx();
 
-		NetworkManager::update_car_state(&state);
+		if (mode == NORMAL) {
+			controller.update(drive);
 
-		// update steer
-        if (state.steer_changed) {
-            steer = controller.calculate_steer(state.steer, state.side);
-            state.steer_changed = false;
-        }
 
-		// update drive
-		drive = controller.calculate_drive(state.current_speed, state.target_speed);
+			NetworkManager::update_car_state(&state);
 
-		LEDHandler::update();
-     	
-		// blink
-		blink_counter = (blink_counter + 1) % blink_period;
-		if (blink_counter == 0) {
-			LEDHandler::toggle();
-			NetworkManager::send(state.current_speed);
-			//NetworkManager::send(state.target_speed);
-			//NetworkManager::send(state.steer);
-			//NetworkManager::send((float)state.side);
+			// update steer
+			if (state.steer_changed) {
+				steer = controller.calculate_steer(state.steer, state.side);
+				state.steer_changed = false;
+			}
+
+			// update drive
+			drive = controller.calculate_drive(state.current_speed, state.target_speed);
+
+		} else if (mode == IGNORING) {
+			if (NetworkManager::restart_bit_received) {
+				NetworkManager::restart_bit_received = false;
+				mode = NORMAL;
+				blink_period = NORMAL_BLINK_PERIOD;
+			}
+
+			drive = controller.calculate_drive(state.current_speed, 0.f);
 		}
-
+		handle_blink();
 		wait(0.04f);
     }
 
 	drive = 0;
 
-	LEDHandler::blink_blocking(0.1f, 10);
+	LEDHandler::blink_blocking(0.05f, 10);
 }

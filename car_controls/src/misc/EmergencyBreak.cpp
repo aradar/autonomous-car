@@ -6,15 +6,8 @@ EmergencyBreak::EmergencyBreak()
 	: echo_one(PA_8), trig_one(PF_1), echo_two(PF_0), trig_two(PB_5), enabled(true)
 {}
 
-void EmergencyBreak::disable()
-{
-	enabled = false;
-}
-
-void EmergencyBreak::enable()
-{
-	enabled = true;
-}
+void EmergencyBreak::disable() { enabled = false; }
+void EmergencyBreak::enable() { enabled = true; }
 
 bool EmergencyBreak::emergency_stop() {
 	if (!enabled) {

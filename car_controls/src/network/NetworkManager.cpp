@@ -8,6 +8,8 @@ Serial NetworkManager::pi(PB_6, PB_7, 9600); //UART1_TX / D4, UART1_RX / D5
 float NetworkManager::test_value1 = 0.f;
 float NetworkManager::test_value2 = 0.f;
 
+bool NetworkManager::restart_bit_received = false;
+
 NetworkManager::NetworkManager()
 {}
 
@@ -20,6 +22,9 @@ CarState car_state_tmp;
 void serialReadCallback(uint8_t* fixed_buffer) {
 	SerialInputProtocol input = SerialInputProtocol::read(fixed_buffer);
 	input.update_car_state(&car_state_tmp);
+	if (input.restart_bit) {
+		NetworkManager::restart_bit_received = true;
+	}
 }
 
 int rx_buffer_index = 0;
