@@ -16,7 +16,7 @@ int main() {
 }
 
 Main::Main()
-	: mode(NORMAL), drive(PA_12), steer(PB_0), blink_counter(0), blink_period(NORMAL_BLINK_PERIOD)
+	: mode(NORMAL), drive(PA_12), steer(PB_0), blink_counter(0), blink_period(NORMAL_BLINK_PERIOD), break_counter(0)
 {}
 
 void Main::handle_blink() {
@@ -40,9 +40,9 @@ void Main::run()
 
 	// calibrate
 	sequences::calibrate();
+	wait(1);
 
 	// test
-	wait(1);
 	/*
 	sequences::test_steer(steer);
 	sequences::test_drive(drive);
@@ -54,12 +54,14 @@ void Main::run()
 	NetworkManager::init(state);
 
 	while(1) {
-		if (emergency_break.emergency_stop()) {
-			mode = IGNORING;
+		if (mode == NORMAL) {
+			if (emergency_break.emergency_stop()) {
+				mode = IGNORING;
 
-			state.target_speed = 0.f;
-			steer = 0.5f;
-			blink_period = IGNORING_BLINK_PERIOD;
+				state.target_speed = 0.f;
+				steer = 0.5f;
+				blink_period = IGNORING_BLINK_PERIOD;
+			}
 		}
 
 		// update current speed
@@ -84,9 +86,15 @@ void Main::run()
 				NetworkManager::restart_bit_received = false;
 				mode = NORMAL;
 				blink_period = NORMAL_BLINK_PERIOD;
+				break_counter = 0;
+			} else {
+				break_counter++;
+				if (break_counter < 10) {
+					drive = 0.f; // hard break
+				} else {
+					drive = controller.calculate_drive(state.current_speed, 0.f); // soft break
+				}
 			}
-
-			drive = controller.calculate_drive(state.current_speed, 0.f);
 		}
 		handle_blink();
 		wait(0.04f);

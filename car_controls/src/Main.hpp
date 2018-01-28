@@ -33,6 +33,7 @@ class Main
 
 		int blink_counter;
 		int blink_period;
+		int break_counter;
 
 		static const int NORMAL_BLINK_PERIOD;
 		static const int IGNORING_BLINK_PERIOD;

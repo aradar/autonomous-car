@@ -15,13 +15,19 @@ bool EmergencyBreak::emergency_stop() {
 	}
 	int distance = 0;
 
+	//const int MICRO_SECONDS_TO_BREAK = 7000; // should always be greater than 2100
+	const int CYCLES_TO_BREAK = 700; // should always be greater than 210
+
 	trig_one = 1; // send trigger signal for sensor 1
 	sonar.reset();
 	wait_us(10.0);
 	trig_one = 0;
+
 	while (echo_one==0) {} // wait for echo signal
+
 	sonar.start();
-	while (echo_one==1) {}
+	int counter = 0;
+	while (echo_one==1 && counter < CYCLES_TO_BREAK) { counter++; wait_us(10); }
 
 	sonar.stop(); // stops time echo needed
 	distance = (sonar.read_us())/58.0; // distance between
@@ -37,7 +43,8 @@ bool EmergencyBreak::emergency_stop() {
 	trig_two = 0;
 	while (echo_two==0) {}
 	sonar.start();
-	while (echo_two==1) {}
+	counter = 0;
+	while (echo_two==1 && counter < CYCLES_TO_BREAK) { counter++; wait_us(10); }
 	sonar.stop();
 	distance = (sonar.read_us())/58.0;
 	//printf("Second: %d cm \n\r", distance);
