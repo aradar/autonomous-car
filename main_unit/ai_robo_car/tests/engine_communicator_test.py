@@ -31,7 +31,7 @@ class EngineCommunicatorServer:
             result = struct.unpack("<Bff", client.recv(9))
             received_size = received_size + 1
             self.received_messages.append(result)
-            time.sleep(0.001) # otherwise the server throws a unhandled exception
+            time.sleep(0.001)  # otherwise the server throws a unhandled exception
 
 
 class EngineCommunicatorTester(unittest.TestCase):
@@ -43,11 +43,11 @@ class EngineCommunicatorTester(unittest.TestCase):
         self.sample_objects.append(EngineInstruction(1, 30))
         self.engine_communication_server = EngineCommunicatorServer(len(self.sample_objects))
         self.server_socket = self.engine_communication_server.start()
-        self.layer = EngineCommunicator(None, None, True)
+        self.engineCommunicator = EngineCommunicator(None, None, True)
 
     def test_engine_communicator_received_data_should_be_ok(self):
         for sample_object in self.sample_objects:
-            self.layer.call_from_upper(sample_object)
+            self.engineCommunicator.call_from_upper(sample_object)
 
         while len(self.engine_communication_server.received_messages) < len(self.sample_objects):
             pass
@@ -56,8 +56,9 @@ class EngineCommunicatorTester(unittest.TestCase):
             self.assertEqual((i * 64, math.fabs(sample_object.steer), math.fabs(sample_object.speed)),
                              self.engine_communication_server.received_messages[i], msg=i)
 
+
     def tearDown(self):
-        self.layer.close()
+        self.engineCommunicator.close()
         self.server_socket.close()
 
 

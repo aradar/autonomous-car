@@ -1,22 +1,27 @@
 #!/usr/bin/env python3
 """
-This is a test
+This is the cli for the best car on the planet!
 
 Usage:
-  main start [<ipc_secret>] [--address=<ipc_address>] [--port=<ipc_port>] [--frequency=<heart_frequency>] [--fork]
-  main pause [<ipc_secret>] [--address=<ipc_address>] [--port=<ipc_port>]
-  main resume [<ipc_secret>] [--address=<ipc_address>] [--port=<ipc_port>]
-  main stop [<ipc_secret>] [--address=<ipc_address>] [--port=<ipc_port>]
-  main (-h | --help)
+  racecar start [-s STRING] [-a STRING] [-p INT] [--fr FLOAT] [--stm FLOAT] [--spm FLOAT] [--tcd INT] [--pv FLOAT] [--lf LOG_FILE]
+  racecar pause [-s STRING] [-a STRING] [-p INT]
+  racecar resume [-s STRING] [-a STRING] [-p INT]
+  racecar stop [-s STRING] [-a STRING] [-p INT]
+  racecar (-h | --help)
 
 Options:
-  -h --help                       Show this screen.
-  --address=<ipc_address>         Address to which the ipc connects [default: localhost].
-  --port=<ipc_port>               Port to which the ipc connects [default: 6789].
-  --frequency=<heart_frequency>   Frequency at which the logic loop runs [default: 30].
-  --fork                          Forks the process shortly before really starting the services [default: False].
-
+  -h --help                         Show this screen.
+  -s STRING --ipc_secret STRING     Hmac secret which gets used by the ipc socket.
+  -a STRING --ipc_address STRING    Address to which the ipc socket binds [default: localhost].
+  -p INT --ipc_port INT             Port to which the ipc socket binds [default:  6789].
+  --fr FLOAT                        Frequency at which the logic loop runs [default: 30].
+  --stm FLOAT                       Intensity of the steering [Default: 0.5].
+  --spm FLOAT                       Manuel speed increase [Default: 1.5]
+  --tcd INT                         How long a valid target is cached before being dropped. [Default: 30]
+  --pv FLOAT                        Allowed absolute variance of the proportion of the detected object [Default: 0.5]
+  --lf LOG_FILE                     Write log also to the specified file.
 """
+
 from multiprocessing.connection import Client
 from typing import Union
 
@@ -24,21 +29,21 @@ import logging
 from docopt import docopt
 
 from ai_robo_car.layer import ObjectRecognizer, RelativeTranslator, PathFinder, PathTranslator, EngineCommunicator
-from ai_robo_car.layer.test_layer import PrintTestLayer
 from ai_robo_car.layer_management import RemoteControlCommand, RemoteControlMessage, build_and_start_env
 from tests.engine_communicator_test import EngineCommunicatorServer
 
 
-def build_layers():
+def build_layers(target_cache_duration: int, steer_multiplier: float, speed_multiplier: float, proportion_variance: float):
     object_recognizer = ObjectRecognizer(None, None)
-    relative_translator = RelativeTranslator(None, None, camera_height=0.012, camera_position_angle=80,
-                                             camera_x_view_angle=150, camera_y_view_angle=94)
-    path_finder = PathFinder(None, None)
-    path_translator = PathTranslator(None, None)
-    engine_communicator_server = EngineCommunicatorServer(-1)
-    engine_communicator_server.start()
-    engine_communicator = EngineCommunicator(None, None, True)
-    #engine_communicator = EngineCommunicator(None, None, False)
+    relative_translator = RelativeTranslator(None, None, camera_height=0.165, camera_position_angle=90,
+                                             camera_x_view_angle=150, camera_y_view_angle=94,
+                                             proportion_variance=proportion_variance)
+    path_finder = PathFinder(None, None, target_cache_duration=target_cache_duration)
+    path_translator = PathTranslator(None, None, steer_multiplier=steer_multiplier, speed_multiplier=speed_multiplier)
+    #engine_communicator_server = EngineCommunicatorServer(-1)
+    #engine_communicator_server.start()
+    #engine_communicator = EngineCommunicator(None, None, True, steer_multiplier=steer_multiplier)
+    engine_communicator = EngineCommunicator(None, None, False)
 
     object_recognizer.lower = relative_translator
     relative_translator.lower = path_finder
@@ -60,7 +65,7 @@ def encode_ipc_secret(ipc_secret: str) -> Union[bytes, None]:
     return encoded_ipc_secret
 
 
-def setup_logger():
+def setup_logger(log_file: str):
     root_logger = logging.getLogger()
 
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -69,14 +74,25 @@ def setup_logger():
     stream_handler.setLevel(logging.DEBUG)
     stream_handler.setFormatter(formatter)
 
+    if log_file is not None:
+        file_handler = logging.FileHandler(log_file)
+        root_logger.addHandler(file_handler)
+
     root_logger.setLevel(logging.DEBUG)
     root_logger.addHandler(stream_handler)
 
+    root_logger.info("-----starting-----")
 
-def start_server(ipc_secret: str, heart_frequency: float = 30,
-                 ipc_address: str = "localhost", ipc_port: int = 6789):
-    setup_logger()
-    highest_layer = build_layers()
+
+def start_server(ipc_secret: str, heart_frequency: float, ipc_address: str, ipc_port: int,
+                 steer_multiplier: float, speed_multiplier: float, target_cache_duration: int,
+                 proportion_variance: float, log_file: str):
+    setup_logger(log_file)
+    highest_layer = build_layers(
+        target_cache_duration=target_cache_duration,
+        steer_multiplier=steer_multiplier,
+        speed_multiplier=speed_multiplier,
+        proportion_variance=proportion_variance)
     build_and_start_env(
         highest_layer=highest_layer,
         frequency=heart_frequency,
@@ -94,28 +110,33 @@ if __name__ == "__main__":
     arguments = docopt(__doc__)
     if arguments["start"]:
         start_server(
-            ipc_secret=arguments["<ipc_secret>"],
-            heart_frequency=float(arguments["--frequency"]),
-            ipc_address=arguments["--address"],
-            ipc_port=int(arguments["--port"]))
+            ipc_secret=arguments["--ipc_secret"],
+            ipc_address=arguments["--ipc_address"],
+            ipc_port=int(arguments["--ipc_port"]),
+            heart_frequency=float(arguments["--fr"]),
+            steer_multiplier=float(arguments["--stm"]),
+            speed_multiplier=float(arguments["--spm"]),
+            target_cache_duration=int(arguments["--tcd"]),
+            proportion_variance=int(arguments["--pv"]),
+            log_file=arguments["--lf"])
     elif arguments["pause"]:
         communicate_with_server(
-            ipc_secret=arguments["<ipc_secret>"],
-            ipc_address=arguments["--address"],
-            ipc_port=int(arguments["--port"]),
+            ipc_secret=arguments["--ipc_secret"],
+            ipc_address=arguments["--ipc_address"],
+            ipc_port=int(arguments["--ipc_port"]),
             command=RemoteControlCommand.PAUSE
         )
     elif arguments["resume"]:
         communicate_with_server(
-            ipc_secret=arguments["<ipc_secret>"],
-            ipc_address=arguments["--address"],
-            ipc_port=int(arguments["--port"]),
+            ipc_secret=arguments["--ipc_secret"],
+            ipc_address=arguments["--ipc_address"],
+            ipc_port=int(arguments["--ipc_port"]),
             command=RemoteControlCommand.RESUME
         )
     elif arguments["stop"]:
         communicate_with_server(
-            ipc_secret=arguments["<ipc_secret>"],
-            ipc_address=arguments["--address"],
-            ipc_port=int(arguments["--port"]),
+            ipc_secret=arguments["--ipc_secret"],
+            ipc_address=arguments["--ipc_address"],
+            ipc_port=int(arguments["--ipc_port"]),
             command=RemoteControlCommand.SHUTDOWN
         )

@@ -2,16 +2,19 @@
 
 import os
 import sys
+import math
+import time
+import struct
 
 import serial
 
-from src.packet import Packetizer, Mode, Direction
+from ai_robo_car.packet import Packetizer, Side, Direction
 
-print(os.environ["PYTHONPATH"])
+#print(os.environ["PYTHONPATH"])
 
-os.environ["PYTHONPATH"] = "../ai_robo_car/"
+#os.environ["PYTHONPATH"] = "../ai_robo_car/"
 
-print(os.environ["PYTHONPATH"])
+#print(os.environ["PYTHONPATH"])
 
 dev = '/dev/ttyS0'
 baud = 9600
@@ -22,20 +25,28 @@ print('set serial device to: ' + str(dev))
 ser.baudrate = baud
 print('configure baudrate to: ' + str(baud))
 
-if len(sys.argv) is 4:
-    control_type = str(sys.argv[1])
-    control_value = float(sys.argv[2]) 
-    debug_level = int(sys.argv[3])
+if (len(sys.argv) is 3) or (len(sys.argv) is 4):
+    steer_value = float(sys.argv[1]) 
+    speed_value = float(sys.argv[2])
+    debug_level = 42 #int(sys.argv[3])
+
+    send_restart = (len(sys.argv) is 4) and (sys.argv[3] == "--reset")
     
-    if control_type == '-d': # drive
-        Packetizer.write_data(ser, Mode.DRIVE, Direction.BACKWARD, debug_level, control_value);
-    elif control_type == '+d':
-        Packetizer.write_data(ser, Mode.DRIVE, Direction.FORWARD, debug_level, control_value);
-    elif control_type == '+s': # steer
-        Packetizer.write_data(ser, Mode.STEER, Direction.FORWARD, debug_level, control_value);
-    elif control_type == '-s': 
-        Packetizer.write_data(ser, Mode.STEER, Direction.BACKWARD, debug_level, control_value);
+    if steer_value < 0: # side
+        side = Side.LEFT
+    else:
+        side = Side.RIGHT
+    if speed_value < 0: # direction
+        direction = Direction.BACKWARD
+    else:
+        direction = Direction.FORWARD
+
+    if send_restart:
+        data = Packetizer.create_data(side, direction, debug_level, math.fabs(steer_value), math.fabs(speed_value), is_restart=True);
+    else:
+        data = Packetizer.create_data(side, direction, debug_level, math.fabs(steer_value), math.fabs(speed_value));
+    ser.write(data)
 else:
-    print('usage [+d/-d/+s/-s] <control_value> <debug_level>')
+    print('usage <steer_value> <speed_value>')
     
 ser.close()

@@ -16,6 +16,11 @@ class PathTranslator(AbstractLayer[TargetPoint, EngineInstruction]):
     Those values are then passed to the EngineCommunicator
     """
 
+    def __init__(self, upper: AbstractLayer, lower: AbstractLayer, steer_multiplier: float = 1, speed_multiplier: float = 1):
+        super().__init__(upper, lower)
+        self.steer_multiplier = steer_multiplier
+        self.speed_multiplier = speed_multiplier
+
     def call_from_upper(self, target_point: TargetPoint) -> None:
         """
         'angle': steering angle from    0(deg) to 360(deg). 0(deg) is located at 0(rad)
@@ -63,10 +68,11 @@ class PathTranslator(AbstractLayer[TargetPoint, EngineInstruction]):
                     steer = 90 - angle
                 elif angle < 0:
                     steer = -90 - angle
+                steer = steer * self.steer_multiplier
                 speed = 1 - (math.fabs(steer) / threshold_angle)
                 speed = 0.5 + 0.5 * speed
+                speed = speed * self.speed_multiplier
 
-            speed = max(0, min(1, speed)) # savety first
             engine_instruction = EngineInstruction(speed, steer)
 
         logger.debug("produced {}".format(pformat(engine_instruction)))

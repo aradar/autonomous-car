@@ -15,6 +15,7 @@ class EngineCommunicator(AbstractLayer[EngineInstruction, None]):
     """
     The EngineCommunicator handles the serial communication between main unit and car controls (car engine).
     """
+
     def __init__(self, upper: AbstractLayer, lower: AbstractLayer, is_test_communication=False):
         """
         :param upper: the upper layer, most of the time the PathTranslator
@@ -30,6 +31,7 @@ class EngineCommunicator(AbstractLayer[EngineInstruction, None]):
             self.ser = serial.Serial('/dev/ttyS0')
             self.ser.baudrate = 9600
 
+
     def call_from_upper(self, engine_instruction: EngineInstruction) -> None:
         """
         called by the upper layer, most of the time PathTranslator
@@ -37,16 +39,18 @@ class EngineCommunicator(AbstractLayer[EngineInstruction, None]):
         :return: None
         """
         if self.ser is not None:
+            data = None
             if engine_instruction is None:
-                data = self.package_engine_instruction(EngineInstruction(0., 0.)) # break
+                data = self.package_engine_instruction(EngineInstruction(0., 0.))  # break
             else:
                 data = self.package_engine_instruction(engine_instruction)
 
-            logger.debug("produced {}".format(pformat(data)))
-            if self.is_test_communication:
-                self.ser.send(data)
-            else:
-                self.ser.write(data)
+            if data is not None:
+                logger.debug("produced {}\n".format(pformat(data)))
+                if self.is_test_communication:
+                    self.ser.send(data)
+                else:
+                    self.ser.write(data)
 
     def package_engine_instruction(self, engine_instruction):
         side = Side.LEFT if engine_instruction.steer < 0 else Side.RIGHT
@@ -81,3 +85,10 @@ class EngineCommunicator(AbstractLayer[EngineInstruction, None]):
 
     def stop(self) -> None:
         self.send_break()
+
+    def resume(self) -> None:
+        data = Packetizer.create_reset_data()
+        if self.is_test_communication:
+            self.ser.send(data)
+        else:
+            self.ser.write(data)

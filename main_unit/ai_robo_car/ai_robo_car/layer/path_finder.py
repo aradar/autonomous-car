@@ -9,6 +9,12 @@ logger = logging.getLogger(__name__)
 
 
 class PathFinder(AbstractLayer[List[DetectedObject], TargetPoint]):
+    def __init__(self, upper: AbstractLayer, lower: AbstractLayer, target_cache_duration: int = 30):
+        super().__init__(upper, lower)
+        self.last_target_point = None
+        self.none_target_counter = 0
+        self.target_cache_duration = target_cache_duration
+
     """
     The PathFinder calculates a point: (float, float) where the car should go to as next step.
     This point is given in the Relative Coordinate System.
@@ -36,9 +42,16 @@ class PathFinder(AbstractLayer[List[DetectedObject], TargetPoint]):
                 target_point = TargetPoint(
                     PathFinder.calculate_center_point(nearest_yellow_cup.position, nearest_blue_cup.position))
 
+                self.last_target_point = target_point
+                self.none_target_counter = 0
+
+        if self.none_target_counter < self.target_cache_duration:
+            if target_point is None:
+                target_point = self.last_target_point
+                self.none_target_counter += 1
+
         logger.debug("produced {}".format(pformat(target_point)))
         self.call_lower(target_point)
-
 
     @staticmethod
     def calculate_center_point(position1: Tuple[float], position2: Tuple[float]) -> Tuple[float]:

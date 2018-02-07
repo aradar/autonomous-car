@@ -142,17 +142,21 @@ class LayerManager(ControllableThread):
 
     def loop(self) -> None:
         self.heart_beat.wait()
-        self.highest_layer.call_from_upper("hallo")  # needs to be changed
+        self.highest_layer.call_from_upper()
         self.heart_beat.clear()
 
     def stop(self) -> None:
+        time.sleep(0.1)
         self.call_func_on_stack("stop")
 
     def pause(self) -> None:
+        time.sleep(0.1)
         self.call_func_on_stack("pause")
 
     def resume(self) -> None:
+        time.sleep(0.1)
         self.call_func_on_stack("resume")
+        time.sleep(0.1)
 
     def call_func_on_stack(self, method_name: str) -> None:
         """

@@ -17,7 +17,7 @@ class RelativeTranslator(AbstractLayer[List[BoundingBox], List[DetectedObject]])
     """
 
     def __init__(self, upper: AbstractLayer, lower: AbstractLayer, camera_height: float, camera_position_angle: float,
-                 camera_x_view_angle: float, camera_y_view_angle: float,
+                 camera_x_view_angle: float, camera_y_view_angle: float, proportion_variance: float,
                  original_image_aspect_ratio: Tuple[float, float] = (1.6, 1.)):
         """
         The original_image_aspect_ratio variable is optional and defaults to (1.6, 1.)
@@ -30,6 +30,7 @@ class RelativeTranslator(AbstractLayer[List[BoundingBox], List[DetectedObject]])
         :param camera_position_angle: the angle in degrees at which the camera is mounted
         :param camera_x_view_angle: the horizontal view angle in degrees of the camera
         :param camera_y_view_angle: the vertical view angle in degrees of the camera
+        :param proportion_variance: absolute variance which is allowed for the detected proportion of the object
         :param original_image_aspect_ratio: the aspect ratio of the original footage
         """
 
@@ -40,6 +41,7 @@ class RelativeTranslator(AbstractLayer[List[BoundingBox], List[DetectedObject]])
         self.camera_x_view_angle = camera_x_view_angle
         self.camera_y_view_angle = camera_y_view_angle
         self.original_image_aspect_ratio = original_image_aspect_ratio
+        self.proportion_variance = proportion_variance
 
     def call_from_upper(self, bounding_boxes: List[BoundingBox]) -> None:
         if self.lower is None:
@@ -49,11 +51,12 @@ class RelativeTranslator(AbstractLayer[List[BoundingBox], List[DetectedObject]])
         if bounding_boxes is not None:
             detected_objects = []
             for bounding_box in bounding_boxes:
-                if self.proportions_fit(bounding_box.width, bounding_box.height):
+                if self.proportions_fit(bounding_box.width, bounding_box.height, self.proportion_variance):
                     radius = bounding_box.width * 0.5
                     y = self.calc_y(bounding_box.bottom, radius)
                     x = self.calc_x(bounding_box.left, radius, y)
-                    detected_objects.append(DetectedObject((x, y), radius, bounding_box.object_type))
+                    if y >= 0.0:
+                        detected_objects.append(DetectedObject((x, y), radius, bounding_box.object_type))
 
             if len(detected_objects) == 0:
                 detected_objects = None
@@ -64,7 +67,7 @@ class RelativeTranslator(AbstractLayer[List[BoundingBox], List[DetectedObject]])
     def call_from_lower(self, message: str) -> None:
         raise NotImplementedError
 
-    def proportions_fit(self, width: float, height: float, allowed_variance: float = 0.1) -> bool:
+    def proportions_fit(self, width: float, height: float, allowed_variance: float = 0.5) -> bool:
         """
         Checks if the proportions of the detected object fit those of a real cup.
 
